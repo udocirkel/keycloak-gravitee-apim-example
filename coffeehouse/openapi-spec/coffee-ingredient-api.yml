@@ -1,0 +1,79 @@
+openapi: 3.0.3
+
+info:
+  title: Coffee Ingredient API
+  version: 1.0.0
+  description: Interne API zur Verwaltung der Zutaten für Kaffeeprodukte.
+
+servers:
+  - url: http://coffee-ingredient-service:8082
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Ingredient
+
+paths:
+  /ingredients:
+    get:
+      summary: Liste aller verfügbaren Kaffeearten mit Zutaten
+      operationId: listIngredients
+      tags: [ Ingredient ]
+      responses:
+        '200':
+          description: Übersicht über alle Zutatenlisten
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientCollection'
+
+  /ingredients/{coffeeType}:
+    get:
+      summary: Zutaten für eine bestimmte Kaffeeart abrufen
+      operationId: getIngredients
+      tags: [ Ingredient ]
+      parameters:
+        - name: coffeeType
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Zutatenliste
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientList'
+
+components:
+
+  securitySchemes:
+
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    IngredientList:
+      type: object
+      properties:
+        coffeeType:
+          type: string
+          description: Bezeichnung des Kaffeeprodukts
+          example: espresso
+        ingredients:
+          type: array
+          description: Zutatenliste für das Kaffeeprodukt
+          items:
+            type: string
+            example: coffee beans
+
+    IngredientCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/IngredientList'
+

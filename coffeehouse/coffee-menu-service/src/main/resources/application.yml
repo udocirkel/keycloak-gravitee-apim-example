@@ -1,0 +1,29 @@
+coffeehouse:
+  external:
+    ingredient-service:
+      url: ${INGREDIENT_SERVICE_URL}
+  security:
+    audience: coffee-menu-api
+    authorized-party: api-gateway
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: coffee-menu-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
