@@ -1,14 +1,21 @@
-version: '3.8'
-
 networks:
   coffeehouse:
     driver: bridge
 
 services:
 
+  # Keycloak                  => http://localhost:8080
+  # Coffee Ingredient Service => http://localhost:8087
+  # Coffee Menu Service       => http://localhost:8088
+  # Coffee Order Service      => http://localhost:8089
+
+  ##############################
+  ###  AUTHORIZATION SERVER  ###
+  ##############################
+
   keycloak:
-    # image: quay.io/keycloak/keycloak:26.4.0
     image: udocirkel/kcgravitee-example/keycloak:1.0.0
+    # image: quay.io/keycloak/keycloak:26.4.0
     environment:
       KC_HOSTNAME: keycloak
       KC_HTTP_PORT: 8080
@@ -32,6 +39,10 @@ services:
       - "9000:9000"
     networks: [coffeehouse]
     command: ["start-dev", "--import-realm"]
+
+  ##########################
+  ###  COFFEEHOUSE APIS  ###
+  ##########################
 
   coffee-ingredient-service:
     image: udocirkel/kcgravitee-example/coffee-ingredient-service:1.0.0

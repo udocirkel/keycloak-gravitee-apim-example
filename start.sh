@@ -1,5 +1,13 @@
 #!/bin/bash
 
-# docker compose -f docker-compose-kc.yml up -d
+echo ""
+echo "Starting Keycloak, Coffee Service, Gravitee APIM containers"
+echo "-----------------------------------------------------------"
 docker compose up -d
+
+echo ""
+echo "Checking container status"
+echo "-------------------------"
 docker ps -a
+
+echo ""
