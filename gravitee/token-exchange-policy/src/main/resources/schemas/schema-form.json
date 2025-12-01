@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "id": "urn:jsonschema:de:udocirkel:example:kcgravitee:gravitee:policy:TokenExchangePolicyConfiguration",
+  "properties": {
+    "authorizedPartyPrefix": {
+      "title": "Authorized Party Prefix",
+      "description": "Prefix of the authorized party of the incoming token that must match in order for an OIDC Token Exchange to be performed.",
+      "type": "string",
+      "default": "coffee-app-"
+    },
+    "targetScope": {
+      "title": "Target Scope",
+      "description": "Scope parameter for the OIDC token exchange.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "authorizedPartyPrefix",
+    "targetScope"
+  ]
+}
