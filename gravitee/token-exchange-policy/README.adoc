@@ -1,8 +1,14 @@
-= TokenExchange Gravitee Policy
+= OIDC Token Exchange Policy
 
 ifdef::env-github[]
-image:https://ci.gravitee.io/buildStatus/icon?job=gravitee-io/example-kcgravitee-gravitee-token-exchange-policy/master["Build status", link="https://ci.gravitee.io/job/gravitee-io/job/example-kcgravitee-gravitee-token-exchange-policy/"]
-image:https://f.hubspotusercontent40.net/hubfs/7600448/gravitee-github-button.jpg["Join the community forum", link="https://community.gravitee.io?utm_source=readme", height=20]
+image:https://ci.gravitee.io/buildStatus/icon?job=gravitee-io/example-kcgravitee-gravitee-token-exchange-policy/master["Build status",link="https://ci.gravitee.io/job/gravitee-io/job/example-kcgravitee-gravitee-token-exchange-policy/"]
+image:https://f.hubspotusercontent40.net/hubfs/7600448/gravitee-github-button.jpg["Join the community forum",link="https://community.gravitee.io?utm_source=readme", height=20]
 endif::[]
 
-Here you can document your TokenExchange Gravitee Policy.
+Die *OIDC Token Exchange Policy* überprüft in der *Request Phase* eingehende Authorization Tokens.
+Wird erkannt, dass es sich um ein Token handelt, das für einen Kunden-Keycloak-Client der API-Management-Plattform ausgestellt wurde, versucht die Policy, dieses Token gegen ein neues Access Token auszutauschen.
+Dieses neue Token wird für den in der Konfiguration definierten Berechtigungskontext der API (Scope) angefordert.
+
+== Voraussetzungen
+
+* Die Einstellung *Extract JWT Claims* muss im API-Plan aktiviert sein, damit die Policy die *Authorized Party* (Claim `azp`) aus dem Token auslesen kann.
