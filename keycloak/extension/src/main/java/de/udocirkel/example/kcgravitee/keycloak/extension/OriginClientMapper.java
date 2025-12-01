@@ -1,13 +1,17 @@
 package de.udocirkel.example.kcgravitee.keycloak.extension;
 
+import com.google.auto.service.AutoService;
+
 import java.util.List;
 
 import org.keycloak.models.*;
+import org.keycloak.protocol.ProtocolMapper;
 import org.keycloak.protocol.oidc.mappers.AbstractOIDCProtocolMapper;
 import org.keycloak.protocol.oidc.mappers.OIDCAccessTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.AccessToken;
 
+@AutoService(ProtocolMapper.class)
 public class OriginClientMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper {
 
     private static final String PROVIDER_ID = "kcgravitee-oidc-origin-client-mapper";
@@ -47,17 +51,19 @@ public class OriginClientMapper extends AbstractOIDCProtocolMapper implements OI
 
     @Override
     public AccessToken transformAccessToken(AccessToken token, ProtocolMapperModel mappingModel, KeycloakSession session, UserSessionModel userSession, ClientSessionContext clientSessionCtx) {
-
-        if (session.getContext().getBearerToken() instanceof AccessToken originToken) {
-
-            if (originToken.getOtherClaims().get(CLAIM_ORIGIN_CLIENT_ID) instanceof String originClientId) {
-                token.setOtherClaims(CLAIM_ORIGIN_CLIENT_ID, originClientId);
-            } else {
-                token.setOtherClaims(CLAIM_ORIGIN_CLIENT_ID, originToken.getIssuedFor());
-            }
-
+        // Incoming token must be an access token
+        if (!(session.getContext().getBearerToken() instanceof AccessToken originToken)) {
+            return token;
         }
 
+        // Preserve value from incoming token if claim is present
+        if (originToken.getOtherClaims().get(CLAIM_ORIGIN_CLIENT_ID) instanceof String originClientId) {
+            token.setOtherClaims(CLAIM_ORIGIN_CLIENT_ID, originClientId);
+            return token;
+        }
+
+        // Set value from incoming token (issued for)
+        token.setOtherClaims(CLAIM_ORIGIN_CLIENT_ID, originToken.getIssuedFor());
         return token;
     }
 

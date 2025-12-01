@@ -117,11 +117,6 @@ GET {{MENU_SERVICE_URL}}/coffees/latte
 Authorization: Bearer {{ACCESS_TOKEN}}
 Accept: application/json
 
-### Menu: Latte Produkt über API-Gateway abfragen
-GET {{MENU_APIGW_URL}}/coffees/latte
-Authorization: Bearer {{ACCESS_TOKEN}}
-Accept: application/json
-
 ### Menu: Alle Kaffeeprodukte abfragen
 GET {{MENU_SERVICE_URL}}/coffees
 Authorization: Bearer {{ACCESS_TOKEN}}
