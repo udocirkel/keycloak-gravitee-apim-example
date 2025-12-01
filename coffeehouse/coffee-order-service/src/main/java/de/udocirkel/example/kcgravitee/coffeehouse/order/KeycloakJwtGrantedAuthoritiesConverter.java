@@ -1,6 +1,9 @@
 package de.udocirkel.example.kcgravitee.coffeehouse.order;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,34 +23,55 @@ public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Co
 
     private final JwtGrantedAuthoritiesConverter defaultConverter = new JwtGrantedAuthoritiesConverter();
 
-    private final String audience;
+    private final List<String> audiences;
 
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
-        var authorities = new HashSet<>(defaultConverter.convert(jwt));
+        return Stream.of(
+                        defaultConverter.convert(jwt).stream(),
+                        getRealmRoles(jwt).map(this::toAuthority),
+                        getResourceRoles(jwt, audiences).map(this::toAuthority)
+                )
+                .flatMap(Function.identity())
+                .collect(Collectors.toSet());
+    }
 
-        // Realm roles
-        Map<String, Object> realmAccess = jwt.getClaim(CLAIM_REALM_ACCESS);
-        if (realmAccess != null && realmAccess.get(ROLES) instanceof Collection<?> roles) {
-            authorities.addAll(roles.stream()
-                    .map(Object::toString)
-                    .map(role -> new SimpleGrantedAuthority(AUTHORITY_PREFIX + role))
-                    .toList());
+    private Stream<?> getRealmRoles(Jwt jwt) {
+        if (!(jwt.getClaim(CLAIM_REALM_ACCESS) instanceof Map<?, ?> realmAccess)) {
+            return Stream.empty();
         }
-
-        // Client (resource) roles
-        Map<String, Object> resourceAccess = jwt.getClaim(CLAIM_RESOURCE_ACCESS);
-        if (resourceAccess != null) {
-            var value = resourceAccess.get(audience);
-            if (value instanceof Map<?, ?> map && map.get(ROLES) instanceof Collection<?> clientRoles) {
-                authorities.addAll(clientRoles.stream()
-                        .map(Object::toString)
-                        .map(role -> new SimpleGrantedAuthority(AUTHORITY_PREFIX + role))
-                        .toList());
-            }
+        if (!(realmAccess.get(ROLES) instanceof Collection<?> roles)) {
+            return Stream.empty();
         }
+        return roles.stream().filter(Objects::nonNull);
+    }
 
-        return authorities;
+    private Stream<?> getResourceRoles(Jwt jwt, List<String> audiences) {
+        if (audiences == null || audiences.isEmpty()) {
+            return Stream.empty();
+        }
+        return audiences.stream()
+                .flatMap(audience -> getResourceRoles(jwt, audience));
+    }
+
+    private Stream<?> getResourceRoles(Jwt jwt, String audience) {
+        if (audience == null) {
+            return Stream.empty();
+        }
+        if (!(jwt.getClaim(CLAIM_RESOURCE_ACCESS) instanceof Map<?, ?> resourceAccess)) {
+            return Stream.empty();
+        }
+        if (!(resourceAccess.get(audience) instanceof Map<?, ?> boundResourceAccess)) {
+            return Stream.empty();
+        }
+        if (!(boundResourceAccess.get(ROLES) instanceof Collection<?> roles)) {
+            return Stream.empty();
+        }
+        return roles.stream().filter(Objects::nonNull);
+    }
+
+    private GrantedAuthority toAuthority(Object role) {
+        return new SimpleGrantedAuthority(AUTHORITY_PREFIX + Objects.toString(role));
     }
 
 }

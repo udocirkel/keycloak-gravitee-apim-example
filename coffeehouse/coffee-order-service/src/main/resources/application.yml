@@ -2,9 +2,6 @@ coffeehouse:
   external:
     menu-service:
       url: ${MENU_SERVICE_URL}
-  security:
-    audience: coffee-order-api
-    authorized-party: api-gateway
 
 logging:
   level:
@@ -26,4 +23,5 @@ spring:
     oauth2:
       resourceserver:
         jwt:
+          audiences: coffee-order-api
           issuer-uri: ${JWT_ISSUER_URI}
