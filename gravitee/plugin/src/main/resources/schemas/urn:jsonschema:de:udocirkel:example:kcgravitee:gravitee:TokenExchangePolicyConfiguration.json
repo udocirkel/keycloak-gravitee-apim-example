@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "urn:jsonschema:de:udocirkel:example:kcgravitee:gravitee:TokenExchangePolicyConfiguration",
+  "type": "object",
+  "properties": {
+    "headerName": {
+      "type": "string",
+      "title": "Header Name",
+      "description": "Name des HTTP-Headers, der gesetzt werden soll."
+    },
+    "headerValue": {
+      "type": "string",
+      "title": "Header Value",
+      "description": "Wert des Headers, der in die Anfrage eingefügt wird."
+    }
+  },
+  "required": ["headerName", "headerValue"]
+}

@@ -1,0 +1,88 @@
+openapi: 3.0.3
+
+info:
+  title: Coffee Menu API
+  version: 1.0.0
+  description: |
+    Verwaltung der angebotenen Kaffeeprodukte.
+    Jedes Kaffeeprodukt beinhaltet den Preis für eine Einheit
+    und referenziert optionale die Zutaten (vom coffee-ingredient-service).
+
+servers:
+  - url: http://coffee-menu-service:8081
+
+security:
+  - bearerAuth: [ ]
+
+tags:
+  - name: Menu
+
+paths:
+
+  /coffees:
+    get:
+      summary: Liste aller angebotenen Kaffeeprodukte
+      operationId: listCoffees
+      tags: [ Menu ]
+      responses:
+        '200':
+          description: Liste mit Kaffeeprodukten
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoffeeCollection'
+
+  /coffees/{coffeeType}:
+    get:
+      summary: Einzelnes angebotenes Kaffeeprodukt abrufen
+      operationId: getCoffee
+      tags: [ Menu ]
+      parameters:
+        - name: coffeeType
+          description: Bezeichnung des Kaffeeprodukts
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ein Kaffeeprodukt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coffee'
+
+components:
+
+  securitySchemes:
+
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    Coffee:
+      type: object
+      required: [ type, price ]
+      properties:
+        type:
+          type: string
+          description: Bezeichnung des Kaffeeprodukts
+          example: espresso
+        price:
+          type: number
+          description: Preis für eine Einheit
+          example: 2.5
+        ingredients:
+          type: array
+          description: Zutaten-Liste
+          items:
+            type: string
+
+    CoffeeCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/Coffee'
+
