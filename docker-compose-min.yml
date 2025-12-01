@@ -1,3 +1,5 @@
+version: "3.8"
+
 networks:
   coffeehouse:
     driver: bridge
@@ -8,14 +10,11 @@ volumes:
 
 services:
 
-  # Keycloak                      => http://localhost:8080
-  # APIM API Gateway              => http://localhost:8082
-  # APIM Management UI (nginx)    => http://localhost:8084
-  # APIM Management API (nginx)   => http://localhost:8084/management
-  # APIM Developer Portal (nginx) => http://localhost:8084/portal
-  # Coffee Ingredient Service     => http://localhost:8087
-  # Coffee Menu Service           => http://localhost:8088
-  # Coffee Order Service          => http://localhost:8089
+  # Keycloak              => http://localhost:8080
+  # APIM API Gateway      => http://localhost:8082
+  # APIM Management UI    => http://localhost:8084
+  # APIM Management API   => http://localhost:8084/management
+  # APIM Developer Portal => http://localhost:8084/portal
 
   ##############################
   ###  AUTHORIZATION SERVER  ###
