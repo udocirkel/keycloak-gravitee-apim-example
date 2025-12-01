@@ -15,21 +15,32 @@
 
     <modules>
         <module>token-exchange-policy</module>
-        <!-- module>plugin</module-->
         <module>docker</module>
     </modules>
 
     <properties>
         <!-- Libs -->
+        <caffeine.version>3.2.3</caffeine.version>
         <gravitee.version>4.0.2</gravitee.version>
+        <lombok.version>1.18.42</lombok.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.gravitee.gateway</groupId>
                 <artifactId>gravitee-gateway-api</artifactId>
                 <version>${gravitee.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
