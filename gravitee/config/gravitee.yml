@@ -1,0 +1,31 @@
+# =====================================================
+# Gravitee.io Gateway configuration
+# =====================================================
+
+repositories:
+
+  # Management repository (stores APIs, plans, etc.)
+  management:
+    type: mongodb
+    mongodb:
+      uri: mongodb://mongodb:27017/gravitee?retryWrites=true&w=majority
+
+  # Ratelimit repository
+  ratelimit:
+    type: mongodb
+    mongodb:
+      uri: mongodb://mongodb:27017/gravitee?retryWrites=true&w=majority
+
+  # Analytics repository (stores metrics, logs)
+  analytics:
+    type: elasticsearch
+    elasticsearch:
+      endpoints:
+        - http://elasticsearch:9200
+      index: gravitee
+      security:
+        enabled: false
+
+# HTTP Server (optional)
+http:
+  port: 8082

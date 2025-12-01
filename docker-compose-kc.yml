@@ -1,0 +1,72 @@
+version: '3.8'
+
+networks:
+  coffeehouse:
+    driver: bridge
+
+services:
+
+  keycloak:
+    # image: quay.io/keycloak/keycloak:26.4.0
+    image: udocirkel/kcgravitee-example/keycloak:1.0.0
+    environment:
+      KC_HOSTNAME: keycloak
+      KC_HTTP_PORT: 8080
+      KC_DB: dev-mem
+      KC_HEALTH_ENABLED: 'true'
+      KC_METRICS_ENABLED: 'false'
+      KC_LOG_LEVEL: DEBUG
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    healthcheck:
+      # Check nur auf TCP Ebene, da Distroless Image ohne curl, wget
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    volumes:
+      - ./keycloak/config/realm-coffeehouse.json:/opt/keycloak/data/import/realm-coffeehouse.json:ro
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    networks: [coffeehouse]
+    command: ["start-dev", "--import-realm"]
+
+  coffee-ingredient-service:
+    image: udocirkel/kcgravitee-example/coffee-ingredient-service:1.0.0
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      - JWT_ISSUER_URI=http://keycloak:8080/realms/coffeehouse
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8087:8080"
+    networks: [coffeehouse]
+
+  coffee-menu-service:
+    image: udocirkel/kcgravitee-example/coffee-menu-service:1.0.0
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      - JWT_ISSUER_URI=http://keycloak:8080/realms/coffeehouse
+      - INGREDIENT_SERVICE_URL=http://coffee-ingredient-service:8080
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8088:8080"
+    networks: [coffeehouse]
+
+  coffee-order-service:
+    image: udocirkel/kcgravitee-example/coffee-order-service:1.0.0
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      - JWT_ISSUER_URI=http://keycloak:8080/realms/coffeehouse
+      - MENU_SERVICE_URL=http://coffee-menu-service:8080
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8089:8080"
+    networks: [coffeehouse]

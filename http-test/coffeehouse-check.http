@@ -1,0 +1,177 @@
+
+### Obtain token for COFFEE-APP-123
+POST {{ISSUER_URL}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{COFFEE_APP_123_CLIENT_ID}} &
+client_secret = {{COFFEE_APP_123_CLIENT_SECRET}} &
+grant_type = client_credentials
+
+> {%
+    client.global.set("INITIAL_ACCESS_TOKEN", response.body.access_token);
+    client.global.set("ACCESS_TOKEN", response.body.access_token);
+%}
+
+
+### Introspect initial token with COFFEE-APP-123 => must be blocked 4xx
+POST {{ISSUER_URL}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+Accept: application/jwt
+
+client_id = {{COFFEE_APP_123_CLIENT_ID}} &
+client_secret = {{COFFEE_APP_123_CLIENT_SECRET}} &
+token = {{INITIAL_ACCESS_TOKEN}} &
+token_type_hint = access_token
+
+
+### Obtain token for COFFEE-APP-234
+POST {{ISSUER_URL}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{COFFEE_APP_234_CLIENT_ID}} &
+client_secret = {{COFFEE_APP_234_CLIENT_SECRET}} &
+grant_type = client_credentials
+
+> {%
+    client.global.set("INITIAL_ACCESS_TOKEN", response.body.access_token);
+    client.global.set("ACCESS_TOKEN", response.body.access_token);
+%}
+
+
+### Introspect initial token with COFFEE-APP-234 => must be blocked 4xx
+POST {{ISSUER_URL}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+Accept: application/jwt
+
+client_id = {{COFFEE_APP_234_CLIENT_ID}} &
+client_secret = {{COFFEE_APP_234_CLIENT_SECRET}} &
+token = {{INITIAL_ACCESS_TOKEN}} &
+token_type_hint = access_token
+
+
+### Introspect initial token with API-GATEWAY-CLIENT
+POST {{ISSUER_URL}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+Accept: application/jwt
+
+client_id = {{API_GATEWAY_CLIENT_ID}} &
+client_secret = {{API_GATEWAY_CLIENT_SECRET}} &
+token = {{INITIAL_ACCESS_TOKEN}} &
+token_type_hint = access_token
+
+
+### Perform Token-exchange for COFFEE-MENU-API
+POST {{ISSUER_URL}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = urn:ietf:params:oauth:grant-type:token-exchange &
+client_id = {{API_GATEWAY_CLIENT_ID}} &
+client_secret = {{API_GATEWAY_CLIENT_SECRET}} &
+subject_token = {{ACCESS_TOKEN}} &
+subject_token_type = urn:ietf:params:oauth:token-type:access_token &
+requested_token_type = urn:ietf:params:oauth:token-type:access_token &
+scope = coffee-menu-api
+
+> {%
+    client.global.set("ACCESS_TOKEN", response.body.access_token);
+    client.global.set("XCHD_ACCESS_TOKEN_MENU", response.body.access_token);
+%}
+
+
+### Perform Token-exchange for COFFEE-ORDER-API
+POST {{ISSUER_URL}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = urn:ietf:params:oauth:grant-type:token-exchange &
+client_id = {{API_GATEWAY_CLIENT_ID}} &
+client_secret = {{API_GATEWAY_CLIENT_SECRET}} &
+subject_token = {{ACCESS_TOKEN}} &
+subject_token_type = urn:ietf:params:oauth:token-type:access_token &
+requested_token_type = urn:ietf:params:oauth:token-type:access_token &
+scope = coffee-order-api
+
+> {%
+    client.global.set("ACCESS_TOKEN", response.body.access_token);
+    client.global.set("XCHD_ACCESS_TOKEN_ORDER", response.body.access_token);
+%}
+
+
+########################################################################
+####  COFFEEHOUSE ENDPUNKTE DIREKT ABFRAGEN
+####  => Coffee Ingredient API, Coffe Menu API, Coffee Order API
+########################################################################
+
+
+### Ingredients: Espresso Zutatenliste abfragen
+GET {{INGREDIENT_SERVICE_URL}}/ingredients/espresso
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+### Ingredients: Alle Kaffee Zutatenlisten abfragen
+GET {{INGREDIENT_SERVICE_URL}}/ingredients
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+### Menu: Latte Produkt abfragen
+GET {{MENU_SERVICE_URL}}/coffees/latte
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+### Menu: Latte Produkt über API-Gateway abfragen
+GET {{MENU_APIGW_URL}}/coffees/latte
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+### Menu: Alle Kaffeeprodukte abfragen
+GET {{MENU_SERVICE_URL}}/coffees
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+### Order: Kaffee bestellen
+POST {{ORDER_SERVICE_URL}}/orders
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "coffeeType": "espresso",
+  "userId": "udo.cirkel"
+}
+
+### Order: Alle Kaffee-Bestellungen abfragen
+GET {{ORDER_SERVICE_URL}}/orders
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+
+########################################################################
+####  COFFEEHOUSE ENDPUNKTE ÜBER API-GATEWAY ABFRAGEN
+####  => Coffe Menu API, Coffee Order API
+########################################################################
+
+
+### Menu: Latte Produkt über API-Gateway abfragen
+GET {{MENU_APIGW_URL}}/coffees/latte
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+### Menu: Alle Kaffeeprodukte über API-Gateway abfragen
+GET {{MENU_APIGW_URL}}/coffees
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+
+### Order: Kaffee über API-Gateway bestellen
+POST {{ORDER_APIGW_URL}}/orders
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "coffeeType": "espresso",
+  "userId": "udo.cirkel"
+}
+
+### Order: Alle Kaffee-Bestellungen über API-Gateway abfragen
+GET {{ORDER_APIGW_URL}}/orders
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+

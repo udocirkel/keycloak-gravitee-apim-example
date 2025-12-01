@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.udocirkel.example.kcgravitee</groupId>
+        <artifactId>example-kcgravitee-gravitee</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>example-kcgravitee-gravitee-plugin</artifactId>
+
+    <properties>
+        <gravitee.version>4.0.2</gravitee.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.gravitee.gateway</groupId>
+            <artifactId>gravitee-gateway-api</artifactId>
+            <version>${gravitee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+
+        </plugins>
+    </build>
+
+</project>
