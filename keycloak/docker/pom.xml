@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.udocirkel.example.kcgravitee</groupId>
+        <artifactId>example-kcgravitee-keycloak</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>example-kcgravitee-keycloak-docker</artifactId>
+    <packaging>docker</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <images>
+
+                        <image>
+                            <alias>keycloak</alias>
+                            <name>udocirkel/kcgravitee-example/keycloak:${project.version}</name>
+                            <build>
+                                <dockerFileDir>${project.basedir}/src/main/docker
+                                </dockerFileDir>
+                                <assembly>
+                                    <inline>
+                                        <fileSets>
+                                            <fileSet>
+                                                <directory>${project.basedir}/../extension/target</directory>
+                                                <includes>
+                                                    <include>*.jar</include>
+                                                </includes>
+                                                <outputDirectory>/</outputDirectory>
+                                            </fileSet>
+                                        </fileSets>
+                                    </inline>
+                                    <mode>dir</mode>
+                                </assembly>
+                                <buildOptions>
+                                    <pull>false</pull>
+                                </buildOptions>
+                            </build>
+                        </image>
+
+                    </images>
+                    <autoPull>true</autoPull>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.udocirkel.example.kcgravitee</groupId>
+        <artifactId>example-kcgravitee-gravitee</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>example-kcgravitee-gravitee-docker</artifactId>
+    <packaging>docker</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <images>
+
+                        <image>
+                            <alias>apim-gateway</alias>
+                            <name>udocirkel/kcgravitee-example/apim-gateway:${project.version}</name>
+                            <build>
+                                <dockerFile>${project.basedir}/src/main/docker/Dockerfile.apim-gateway</dockerFile>
+                                <assembly>
+                                    <inline>
+                                        <fileSets>
+                                            <fileSet>
+                                                <directory>${project.basedir}/../token-exchange-policy/target</directory>
+                                                <includes>
+                                                    <include>*.zip</include>
+                                                </includes>
+                                                <outputDirectory>/</outputDirectory>
+                                            </fileSet>
+                                        </fileSets>
+                                    </inline>
+                                    <mode>dir</mode>
+                                </assembly>
+                                <buildOptions>
+                                    <pull>false</pull>
+                                </buildOptions>
+                            </build>
+                        </image>
+
+                        <image>
+                            <alias>apim-management-api</alias>
+                            <name>udocirkel/kcgravitee-example/apim-management-api:${project.version}</name>
+                            <build>
+                                <dockerFile>${project.basedir}/src/main/docker/Dockerfile.apim-management-api</dockerFile>
+                                <assembly>
+                                    <inline>
+                                        <fileSets>
+                                            <fileSet>
+                                                <directory>${project.basedir}/../token-exchange-policy/target</directory>
+                                                <includes>
+                                                    <include>*.zip</include>
+                                                </includes>
+                                                <outputDirectory>/</outputDirectory>
+                                            </fileSet>
+                                        </fileSets>
+                                    </inline>
+                                    <mode>dir</mode>
+                                </assembly>
+                                <buildOptions>
+                                    <pull>false</pull>
+                                </buildOptions>
+                            </build>
+                        </image>
+
+                    </images>
+                    <autoPull>true</autoPull>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

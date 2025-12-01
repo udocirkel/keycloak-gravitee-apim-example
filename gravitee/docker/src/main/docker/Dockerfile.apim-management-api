@@ -1,0 +1,6 @@
+FROM graviteeio/apim-management-api:latest
+USER root
+COPY maven/example-kcgravitee-gravitee-token-exchange-policy-*.zip /opt/graviteeio-management-api/plugins/
+RUN chown graviteeio:root /opt/graviteeio-management-api/plugins/example-kcgravitee-gravitee-token-exchange-policy-*.zip && \
+    chmod 775 /opt/graviteeio-management-api/plugins/example-kcgravitee-gravitee-token-exchange-policy-*.zip
+USER graviteeio

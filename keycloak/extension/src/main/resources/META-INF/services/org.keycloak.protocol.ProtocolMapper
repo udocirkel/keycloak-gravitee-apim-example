@@ -1,0 +1,3 @@
+de.udocirkel.example.kcgravitee.keycloak.extension.CustomerNumberMapper
+de.udocirkel.example.kcgravitee.keycloak.extension.OriginClientMapper
+de.udocirkel.example.kcgravitee.keycloak.extension.TokenIntrospectionBlockerMapper

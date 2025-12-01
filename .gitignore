@@ -1,0 +1,6 @@
+.DS_store
+.idea
+data/*
+history
+target
+tmp
