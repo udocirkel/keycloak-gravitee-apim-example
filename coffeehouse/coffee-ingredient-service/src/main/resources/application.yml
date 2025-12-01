@@ -1,0 +1,26 @@
+coffeehouse:
+  security:
+    audience: coffee-ingredient-api
+    authorized-party: api-gateway
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: coffee-ingredient-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
