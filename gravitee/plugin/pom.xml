@@ -13,23 +13,12 @@
 
     <artifactId>example-kcgravitee-gravitee-plugin</artifactId>
 
-    <properties>
-        <gravitee.version>4.0.2</gravitee.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.gravitee.gateway</groupId>
             <artifactId>gravitee-gateway-api</artifactId>
-            <version>${gravitee.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-
-        </plugins>
-    </build>
 
 </project>
