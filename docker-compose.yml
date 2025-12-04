@@ -8,14 +8,14 @@ volumes:
 
 services:
 
-  # Keycloak                      => http://localhost:8080
-  # APIM API Gateway              => http://localhost:8082
-  # APIM Management UI (nginx)    => http://localhost:8084
-  # APIM Management API (nginx)   => http://localhost:8084/management
-  # APIM Developer Portal (nginx) => http://localhost:8084/portal
-  # Coffee Ingredient Service     => http://localhost:8087
-  # Coffee Menu Service           => http://localhost:8088
-  # Coffee Order Service          => http://localhost:8089
+  # Keycloak                            => http://localhost:8080
+  # Gravitee API Gateway                => http://localhost:8082
+  # Gravitee Management API             => http://localhost:8083
+  # Gravitee Management Console (nginx) => http://localhost:8084
+  # Gravitee Developer Portal (nginx)   => http://localhost:8085
+  # Coffee Ingredient Service           => http://localhost:8087
+  # Coffee Menu Service                 => http://localhost:8088
+  # Coffee Order Service                => http://localhost:8089
 
   ##############################
   ###  AUTHORIZATION SERVER  ###
@@ -23,7 +23,7 @@ services:
 
   keycloak:
     image: udocirkel/kcgravitee-example/keycloak:1.0.0
-    # image: quay.io/keycloak/keycloak:26.4.0
+    restart: always
     environment:
       KC_HOSTNAME: keycloak
       KC_HTTP_PORT: 8080
@@ -54,6 +54,7 @@ services:
 
   mongodb:
     image: mongo:7.0
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand(\"ping\")' || exit 1"]
       interval: 10s
@@ -65,12 +66,16 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
+    restart: always
     environment:
-      - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
       - xpack.security.enabled=false
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     healthcheck:
-      # test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
       test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
       timeout: 5s
@@ -80,27 +85,23 @@ services:
       nofile: { soft: 65536, hard: 65536 }
     volumes:
       - ./data/elastic_data:/usr/share/elasticsearch/data
-#    ports:
-#      - "9200:9200"
     networks: [coffeehouse]
 
   management_api:
     image: udocirkel/kcgravitee-example/apim-management-api:1.0.0
+    restart: always
     depends_on:
       elasticsearch:
         condition: service_healthy
       mongodb:
         condition: service_healthy
     environment:
-      - gravitee_management_mongodb_uri=mongodb://mongodb:27017/gravitee
+      - gravitee_management_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
       - gravitee_analytics_elasticsearch_endpoints_0=http://elasticsearch:9200
-      # -> Um ganz sicherzugehen, setze alle Varianten:
-      - gravitee_mongodb_uri=mongodb://mongodb:27017/gravitee
-      - gravitee_rate_limit_repository_type=mongodb
+      - gravitee_installation_standalone_portal_url=http://localhost:8085
+    ports:
+      - "8083:8083"
     healthcheck:
-      # test: ["CMD", "curl", "-f", "http://localhost:8083/management/health"]
-      # test: ["CMD-SHELL", "curl -u admin:admin -f http://localhost:8083/management/health || exit 1"]
-      # test: ["CMD", "curl", "-f", "http://localhost:8083/_node/health"]
       test: ["CMD-SHELL", "curl -u admin:admin -f http://localhost:8083/management/v2/environments/DEFAULT/apis || exit 1"]
       interval: 10s
       timeout: 5s
@@ -110,13 +111,24 @@ services:
 
   management_ui:
     image: graviteeio/apim-management-ui:latest
+    restart: always
     environment:
-      - MGMT_API_URL=/management/organizations/DEFAULT/environments/DEFAULT/
+      - MGMT_API_URL=http://localhost:8084/management/organizations/DEFAULT/environments/DEFAULT/
+    networks: [coffeehouse]
+
+  portal_ui:
+    image: graviteeio/apim-portal-ui:latest
+    restart: always
+    depends_on:
+      management_api:
+        condition: service_healthy
+    environment:
+      - PORTAL_API_URL=http://localhost:8085/portal/environments/DEFAULT
     networks: [coffeehouse]
 
   gateway:
-    # image: graviteeio/apim-gateway:latest
     image: udocirkel/kcgravitee-example/apim-gateway:1.0.0
+    restart: always
     depends_on:
       mongodb:
         condition: service_healthy
@@ -141,15 +153,28 @@ services:
       - ./gravitee/config/gravitee.yml:/opt/graviteeio-gateway/config/gravitee.yml:ro
     networks: [coffeehouse]
 
-  nginx:
+  nginx_management:
     image: nginx:alpine
+    restart: always
     depends_on:
       - management_ui
       - management_api
     ports:
       - "8084:80"
     volumes:
-      - ./nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/config/nginx_management.conf:/etc/nginx/nginx.conf:ro
+    networks: [coffeehouse]
+
+  nginx_portal:
+    image: nginx:alpine
+    restart: always
+    depends_on:
+      - portal_ui
+      - management_api
+    ports:
+      - "8085:80"
+    volumes:
+      - ./nginx/config/nginx_portal.conf:/etc/nginx/nginx.conf:ro
     networks: [coffeehouse]
 
   ##########################
@@ -158,6 +183,7 @@ services:
 
   coffee-ingredient-service:
     image: udocirkel/kcgravitee-example/coffee-ingredient-service:1.0.0
+    restart: always
     depends_on:
       keycloak:
         condition: service_healthy
@@ -170,6 +196,7 @@ services:
 
   coffee-menu-service:
     image: udocirkel/kcgravitee-example/coffee-menu-service:1.0.0
+    restart: always
     depends_on:
       keycloak:
         condition: service_healthy
@@ -183,6 +210,7 @@ services:
 
   coffee-order-service:
     image: udocirkel/kcgravitee-example/coffee-order-service:1.0.0
+    restart: always
     depends_on:
       keycloak:
         condition: service_healthy
