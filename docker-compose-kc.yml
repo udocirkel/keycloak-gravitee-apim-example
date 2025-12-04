@@ -15,7 +15,7 @@ services:
 
   keycloak:
     image: udocirkel/kcgravitee-example/keycloak:1.0.0
-    # image: quay.io/keycloak/keycloak:26.4.0
+    restart: always
     environment:
       KC_HOSTNAME: keycloak
       KC_HTTP_PORT: 8080
@@ -46,6 +46,7 @@ services:
 
   coffee-ingredient-service:
     image: udocirkel/kcgravitee-example/coffee-ingredient-service:1.0.0
+    restart: always
     depends_on:
       keycloak:
         condition: service_healthy
@@ -58,6 +59,7 @@ services:
 
   coffee-menu-service:
     image: udocirkel/kcgravitee-example/coffee-menu-service:1.0.0
+    restart: always
     depends_on:
       keycloak:
         condition: service_healthy
@@ -71,6 +73,7 @@ services:
 
   coffee-order-service:
     image: udocirkel/kcgravitee-example/coffee-order-service:1.0.0
+    restart: always
     depends_on:
       keycloak:
         condition: service_healthy
