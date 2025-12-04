@@ -1,28 +1,31 @@
 package de.udocirkel.example.kcgravitee.coffeehouse.ingredient;
 
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.server.ServerWebExchange;
 
-@RestController
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Controller
 @RequiredArgsConstructor
 public class IngredientController implements IngredientApi {
 
     private final IngredientService ingredientService;
 
     @Override
-    public ResponseEntity<IngredientList> getIngredients(String coffeeType) {
+    public Mono<ResponseEntity<IngredientList>> getIngredients(String coffeeType, ServerWebExchange exchange) {
         return ingredientService.getIngredients(coffeeType)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok) // 200 OK
+                .defaultIfEmpty(ResponseEntity.notFound().build()); // 404 Not Found
     }
 
     @Override
-    public ResponseEntity<List<IngredientList>> listIngredients() {
-        return ResponseEntity.ok(ingredientService.listIngredients());
+    public Mono<ResponseEntity<Flux<IngredientList>>> listIngredients(ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok( // 200 OK
+                ingredientService.listIngredients()));
     }
 
 }

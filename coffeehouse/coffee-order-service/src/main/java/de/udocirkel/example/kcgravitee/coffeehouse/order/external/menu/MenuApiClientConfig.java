@@ -4,6 +4,7 @@ import de.udocirkel.example.kcgravitee.coffeehouse.order.external.menu.invoker.A
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,14 +33,12 @@ public class MenuApiClientConfig {
     }
 
     private ApiClient ingredientApiClient() {
-        // Eigenen WebClient mit Filter aufbauen
-        final var webClient = WebClient.builder()
+        var webClient = WebClient.builder()
                 .baseUrl(menuServiceUrl)
                 .filter(addBearerTokenFromSecurityContext())
                 .build();
 
-        // OpenAPI ApiClient mit eigenem WebClient verwenden
-        final var apiClient = new ApiClient(webClient);
+        var apiClient = new ApiClient(webClient);
         apiClient.setBasePath(menuServiceUrl);
         return apiClient;
     }
