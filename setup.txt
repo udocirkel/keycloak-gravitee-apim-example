@@ -3,6 +3,12 @@
 Initialisierung der MongoDB Daten
 =================================
 
+docker exec -it <mongodb> mongosh
+
+use gravitee
+
+---------------------------------
+
 WENN ORGANIZATION FEHLT, DANN
 
 db.organizations.insertOne({
@@ -57,6 +63,25 @@ LEER IST, DANN
 db.parameters.insertMany([
   { "_id": ObjectId(), "key": "default_organization_id", "value": "DEFAULT" },
   { "_id": ObjectId(), "key": "default_environment_id", "value": "DEFAULT" }
+])
+
+- - -
+
+Dev Portal URL hinterlegen:
+
+db.parameters.insertMany([
+  {
+    key: "portal.url",
+    value: "http://localhost:8085",
+    referenceType: "ENVIRONMENT",
+    referenceId: "DEFAULT"
+  },
+  {
+    key: "portal.url",
+    value: "http://localhost:8085",
+    referenceType: "ORGANIZATION",
+    referenceId: "DEFAULT"
+  }
 ])
 
 

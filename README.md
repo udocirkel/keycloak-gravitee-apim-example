@@ -95,16 +95,16 @@ This example demonstrates the complete flow:
 
 ## 🌐 Access the Services
 
-| Service                       | URL                                                                                        |
-|-------------------------------|--------------------------------------------------------------------------------------------|
-| **Keycloak Admin Console**    | http://localhost:8080                                                                      |
-| **Gravitee API Gateway**      | http://localhost:8082                                                                      |
-| **Gravitee Management UI**    | http://localhost:8084                                                                      |
-| **Gravitee Management API**   | http://localhost:8084/management                                                           |
-| **Gravitee Portal**           | http://localhost:8084/portal                                                               |
-| **Coffee Order Service**      | gateway:<br/>http://localhost:8082/coffee-order-api<br/>direct:<br/>http://localhost:8089  |
-| **Coffee Menu Service**       | gateway:<br/>http://localhost:8082/coffee-menu-api<br/>direct:<br/>http://localhost:8088   |
-| **Coffee Ingredient Service** | only direct:<br/>http://localhost:8087                                                     |
+| Service                                 | URL                                                                                       |
+|-----------------------------------------|-------------------------------------------------------------------------------------------|
+| **Keycloak Admin Console**              | http://localhost:8080                                                                     |
+| **Gravitee API Gateway**                | http://localhost:8082                                                                     |
+| **Gravitee Management API**             | http://localhost:8083                                                                     |
+| **Gravitee Management Console (nginx)** | http://localhost:8084                                                                     |
+| **Gravitee Developer Portal (nginx)**   | http://localhost:8085                                                                     |
+| **Coffee Order Service**                | gateway:<br/>http://localhost:8082/coffee-order-api<br/>direct:<br/>http://localhost:8089 |
+| **Coffee Menu Service**                 | gateway:<br/>http://localhost:8082/coffee-menu-api<br/>direct:<br/>http://localhost:8088  |
+| **Coffee Ingredient Service**           | only direct:<br/>http://localhost:8087                                                    |
 
 ---
 
