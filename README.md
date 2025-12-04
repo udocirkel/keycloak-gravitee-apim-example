@@ -21,9 +21,13 @@ It shows how Gravitee validates incoming opaque tokens, exchanges them for JWT a
 ├── startkc.sh                  # Start Keycloak-only environment
 ├── stopkc.sh                   # Stop Keycloak-only environment
 │
-├── keycloak/                   # Realm, client and Keycloak config
-├── gravitee/                   # Gravitee Gateway & APIM configuration
+├── keycloak/                   # Keycloak component with preconfigured realm and clients 
+├── gravitee/                   # Gravitee Gateway & APIM components
 ├── nginx/                      # Reverse proxy configuration for Gravitee components
+├── coffeehouse/                # Example services (OAuth2 resource server)
+│   ├── coffee-ingredient-service/  # Spring WebFlux based service (server)
+│   ├── coffee-menu-service/        # Spring WebFlux based service (server + web client)
+│   └── coffee-order-service/       # Spring Web based service (server) using WebFlux (web client) 
 ├── http-test/                  # Demo REST API calls
 │
 ├── pom.xml                     # Maven example client calling the API

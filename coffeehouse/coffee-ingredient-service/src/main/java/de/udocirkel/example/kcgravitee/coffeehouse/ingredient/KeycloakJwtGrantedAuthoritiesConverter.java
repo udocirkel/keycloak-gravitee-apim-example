@@ -1,8 +1,6 @@
 package de.udocirkel.example.kcgravitee.coffeehouse.ingredient;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
@@ -12,9 +10,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import reactor.core.publisher.Flux;
 
 @RequiredArgsConstructor
-public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Flux<GrantedAuthority>> {
 
     private static final String AUTHORITY_PREFIX = "ROLE_";
     private static final String CLAIM_REALM_ACCESS = "realm_access";
@@ -26,14 +25,16 @@ public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Co
     private final List<String> audiences;
 
     @Override
-    public Collection<GrantedAuthority> convert(Jwt jwt) {
-        return Stream.of(
-                        defaultConverter.convert(jwt).stream(),
-                        getRealmRoles(jwt).map(this::toAuthority),
-                        getResourceRoles(jwt, audiences).map(this::toAuthority)
+    public Flux<GrantedAuthority> convert(Jwt jwt) {
+        return Flux.merge(
+                        // Default roles from converter
+                        Flux.fromIterable(defaultConverter.convert(jwt)),
+                        // Realm roles
+                        Flux.fromStream(getRealmRoles(jwt)).map(this::toAuthority),
+                        // Client resource roles for provided audiences
+                        Flux.fromStream(getResourceRoles(jwt, audiences)).map(this::toAuthority)
                 )
-                .flatMap(Function.identity())
-                .collect(Collectors.toSet());
+                .distinct(GrantedAuthority::getAuthority);
     }
 
     private Stream<?> getRealmRoles(Jwt jwt) {
