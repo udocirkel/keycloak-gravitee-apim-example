@@ -130,3 +130,12 @@ Generische Application für den API-Gateway-Client, dem Subsriptions für alle A
 Mit dem API-Gateway-Client soll der Zugriff auf alle APIs erlaubt sein.
 Client ID: api-gateway
 
+= = = = = = = = = = = = = = = = = = = = = = = =
+
+In APIM Console die API URL setzen, damit diese korrekt im Dev Portal angezeigt wird:
+
+Organization -> Entrypoints & Sharding Tags -> Default HTTP Entrypoint
+
+http://localhost:8082
+
+
