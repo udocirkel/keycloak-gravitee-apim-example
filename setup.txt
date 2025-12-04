@@ -3,6 +3,12 @@
 Initialisierung der MongoDB Daten
 =================================
 
+docker exec -it <mongodb> mongosh
+
+use gravitee
+
+---------------------------------
+
 WENN ORGANIZATION FEHLT, DANN
 
 db.organizations.insertOne({
@@ -59,6 +65,25 @@ db.parameters.insertMany([
   { "_id": ObjectId(), "key": "default_environment_id", "value": "DEFAULT" }
 ])
 
+- - -
+
+Dev Portal URL hinterlegen:
+
+db.parameters.insertMany([
+  {
+    key: "portal.url",
+    value: "http://localhost:8085",
+    referenceType: "ENVIRONMENT",
+    referenceId: "DEFAULT"
+  },
+  {
+    key: "portal.url",
+    value: "http://localhost:8085",
+    referenceType: "ORGANIZATION",
+    referenceId: "DEFAULT"
+  }
+])
+
 
 ==========================
 Konfiguration für Keycloak
@@ -104,4 +129,13 @@ Application und Subscriptions für alle APIs für generischen API-Gateway-Client
 Generische Application für den API-Gateway-Client, dem Subsriptions für alle APIs zugeordnet sind.
 Mit dem API-Gateway-Client soll der Zugriff auf alle APIs erlaubt sein.
 Client ID: api-gateway
+
+= = = = = = = = = = = = = = = = = = = = = = = =
+
+In APIM Console die API URL setzen, damit diese korrekt im Dev Portal angezeigt wird:
+
+Organization -> Entrypoints & Sharding Tags -> Default HTTP Entrypoint
+
+http://localhost:8082
+
 
