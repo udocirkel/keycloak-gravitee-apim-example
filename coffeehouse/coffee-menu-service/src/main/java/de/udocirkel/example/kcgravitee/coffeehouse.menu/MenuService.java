@@ -1,13 +1,11 @@
 package de.udocirkel.example.kcgravitee.coffeehouse.menu;
 
 import de.udocirkel.example.kcgravitee.coffeehouse.menu.external.ingredient.IngredientApi;
-import de.udocirkel.example.kcgravitee.coffeehouse.menu.external.ingredient.IngredientApiClientConfig;
 import de.udocirkel.example.kcgravitee.coffeehouse.menu.external.ingredient.IngredientList;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,57 +14,57 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @Service
 @RequiredArgsConstructor
 public class MenuService {
 
     private final IngredientApi ingredientApi;
 
-    private final Map<String, Coffee> coffeeMap = Stream.of(
-                    new Coffee()
-                            .type("espresso")
-                            .price(new BigDecimal("2.5")),
-                    new Coffee()
-                            .type("latte")
-                            .price(new BigDecimal("3.5")),
-                    new Coffee()
-                            .type("cappuccino")
-                            .price(new BigDecimal("3.8"))
+    private final Map<String, Coffee> coffeeMenuMap = Stream.of(
+                    new Coffee().type("espresso").price(new BigDecimal("2.5")),
+                    new Coffee().type("latte").price(new BigDecimal("3.5")),
+                    new Coffee().type("cappuccino").price(new BigDecimal("3.8"))
             )
-            .collect(Collectors.toMap(Coffee::getType, i -> i));
+            .collect(Collectors.toMap(Coffee::getType, c -> c));
 
-    @PreAuthorize("hasRole('ACCESS')")
-    public Optional<Coffee> getCoffee(String coffeeType) {
-        if (coffeeType == null) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(coffeeMap.get(coffeeType))
-                .map(coffee -> {
-                    var ingredients = ingredientApi.getIngredients(coffeeType).block();
-                    return new Coffee()
-                            .type(coffee.getType())
-                            .price(coffee.getPrice())
-                            .ingredients(
-                                    ingredients != null ? ingredients.getIngredients() : List.of()
-                            );
-                });
+    private Mono<Coffee> findCoffeeOnMenu(String coffeeType) {
+        return Mono.justOrEmpty(coffeeType)
+                .map(coffeeMenuMap::get)
+                .map(this::copyCoffee);
     }
 
     @PreAuthorize("hasRole('ACCESS')")
-    public List<Coffee> listCoffees() {
-        var ingredientsMap = ingredientApi.listIngredients().toStream()
-                .filter(i -> i.getIngredients() != null)
+    public Mono<Coffee> getCoffee(String coffeeType) {
+        return findCoffeeOnMenu(coffeeType)
+                .flatMap(coffee ->
+                        ingredientApi.getIngredients(coffeeType)
+                                .defaultIfEmpty(new IngredientList().ingredients(List.of()))
+                                .map(ingredients -> coffee.ingredients(ingredients.getIngredients()))
+                );
+    }
+
+    @PreAuthorize("hasRole('ACCESS')")
+    public Flux<Coffee> listCoffees() {
+        return ingredientApi.listIngredients()
                 .collect(Collectors.toMap(
                         IngredientList::getCoffeeType,
                         IngredientList::getIngredients
-                ));
-        return coffeeMap.values().stream()
-                .map(coffee -> new Coffee()
-                        .type(coffee.getType())
-                        .price(coffee.getPrice())
-                        .ingredients(ingredientsMap.getOrDefault(coffee.getType(), List.of()))
-                )
-                .collect(Collectors.toList());
+                ))
+                .flatMapMany(ingredientsMap ->
+                        Flux.fromIterable(coffeeMenuMap.values())
+                                .map(c -> copyCoffee(c)
+                                        .ingredients(ingredientsMap.getOrDefault(c.getType(), List.of()))
+                                )
+                );
+    }
+
+    private Coffee copyCoffee(Coffee coffee) {
+        return new Coffee()
+                .type(coffee.getType())
+                .price(coffee.getPrice());
     }
 
 }

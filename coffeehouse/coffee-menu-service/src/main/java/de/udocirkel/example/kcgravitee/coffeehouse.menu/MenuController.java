@@ -1,28 +1,32 @@
 package de.udocirkel.example.kcgravitee.coffeehouse.menu;
 
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 
-@RestController
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Controller
 @RequiredArgsConstructor
 public class MenuController implements MenuApi {
 
     private final MenuService menuService;
 
     @Override
-    public ResponseEntity<Coffee> getCoffee(String coffeeType) {
+    public Mono<ResponseEntity<Coffee>> getCoffee(String coffeeType, ServerWebExchange exchange) {
         return menuService.getCoffee(coffeeType)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @Override
-    public ResponseEntity<List<Coffee>> listCoffees() {
-        return ResponseEntity.ok(menuService.listCoffees());
+    public Mono<ResponseEntity<Flux<Coffee>>> listCoffees(ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok( // 200 OK
+                menuService.listCoffees()));
     }
 
 }
