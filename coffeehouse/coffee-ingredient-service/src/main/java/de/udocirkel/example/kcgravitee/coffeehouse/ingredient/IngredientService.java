@@ -2,12 +2,14 @@ package de.udocirkel.example.kcgravitee.coffeehouse.ingredient;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class IngredientService {
@@ -26,14 +28,14 @@ public class IngredientService {
             .collect(Collectors.toMap(IngredientList::getCoffeeType, i -> i));
 
     @PreAuthorize("hasRole('ACCESS')")
-    public Optional<IngredientList> getIngredients(String coffeeType) {
-        return Optional.ofNullable(
-                ingredientsMap.get(coffeeType.toLowerCase()));
+    public Mono<IngredientList> getIngredients(String coffeeType) {
+        IngredientList ingredient = ingredientsMap.get(coffeeType.toLowerCase());
+        return ingredient != null ? Mono.just(ingredient) : Mono.empty();
     }
 
     @PreAuthorize("hasRole('ACCESS')")
-    public List<IngredientList> listIngredients() {
-        return ingredientsMap.values().stream().toList();
+    public Flux<IngredientList> listIngredients() {
+        return Flux.fromIterable(ingredientsMap.values());
     }
 
 }
