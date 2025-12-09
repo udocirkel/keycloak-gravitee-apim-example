@@ -14,13 +14,6 @@ It shows how Gravitee validates incoming opaque tokens, exchanges them for JWT a
 ## 📦 Project Structure
 
 ```
-├── docker-compose.yml          # Full setup (Keycloak + Gravitee + services)
-├── docker-compose-kc.yml       # Keycloak-only setup
-├── start.sh                    # Start full environment
-├── stop.sh                     # Stop full environment
-├── startkc.sh                  # Start Keycloak-only environment
-├── stopkc.sh                   # Stop Keycloak-only environment
-│
 ├── keycloak/                   # Keycloak component with preconfigured realm and clients 
 ├── gravitee/                   # Gravitee Gateway & APIM components
 ├── nginx/                      # Reverse proxy configuration for Gravitee components
@@ -30,8 +23,15 @@ It shows how Gravitee validates incoming opaque tokens, exchanges them for JWT a
 │   └── coffee-order-service/       # Spring Web based service (server) using WebFlux (web client) 
 ├── http-test/                  # Demo REST API calls
 │
-├── pom.xml                     # Maven example client calling the API
-└── setup.txt                   # Additional manual setup instructions
+├── pom.xml                     # Maven build for extensions and container images
+├── setup.txt                   # Instructions for initial manual configuration
+│
+├── docker-compose.yml          # Full local environment (Keycloak + Gravitee + services)
+├── docker-compose-kc.yml       # Keycloak-only local environment (Keycloak + services)
+├── start.sh                    # Start full local environment
+├── stop.sh                     # Stop full local environment
+├── startkc.sh                  # Start Keycloak-only local environment
+└── stopkc.sh                   # Stop Keycloak-only local environment
 ```
 
 ---
