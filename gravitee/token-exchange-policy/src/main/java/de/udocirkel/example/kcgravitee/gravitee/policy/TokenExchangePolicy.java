@@ -25,6 +25,8 @@ import java.net.URLEncoder;
 
 import java.nio.charset.StandardCharsets;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -32,11 +34,24 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * OIDC Token Exchange Policy
+ * <p>
+ * This policy allows exchanging an incoming OIDC token for a new token with
+ * different scopes or audiences. It validates the incoming token against
+ * configurable criteria (authorized party, audiences, and scopes) and defines
+ * the client credentials and target scopes for the token exchange.
+ * <p>
+ * Additionally, the policy caches newly issued tokens until they expire.
+ * This allows reusing the same exchanged token for repeated requests with
+ * the same incoming token and target scope, reducing unnecessary token
+ * requests to the authorization server.
+ * <p>
+ * Use demo token endpoint URL: http://keycloak:8080/realms/coffeehouse/protocol/openid-connect/token
+ */
 public class TokenExchangePolicy {
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenExchangePolicy.class);
-
-    private static final String TOKEN_EXCHANGE_URL = "http://keycloak:8080/realms/coffeehouse/protocol/openid-connect/token";
 
     private static final long TOKEN_CACHE_DURATION = 5;
     private static final TimeUnit TOKEN_CACHE_TIMEUNIT = TimeUnit.MINUTES;
@@ -44,6 +59,9 @@ public class TokenExchangePolicy {
 
     private static final String TOKEN_EXCHANGE_ERROR = "TOKEN_EXCHANGE_ERROR";
     private static final String TOKEN_EXCHANGE_EXIT_ON_ERROR = "TOKEN_EXCHANGE_EXIT_ON_ERROR";
+
+    private static final String ENCODED_GRANT_TYPE_FOR_TOKEN_EXCHANGE = encode("urn:ietf:params:oauth:grant-type:token-exchange");
+    private static final String ENCODED_TOKEN_TYPE_FOR_ACCESS_TOKEN = encode("urn:ietf:params:oauth:token-type:access_token");
 
     private final Cache<String, String> tokenCache =
             Caffeine.newBuilder()
@@ -72,8 +90,8 @@ public class TokenExchangePolicy {
 
         var incomingToken = getIncomingToken(context);
         if (incomingToken == null || incomingToken.isBlank()) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Incoming Bearer token is missing in the Authorization header");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Request has no Authorization header with Bearer token");
             }
             policyChain.doNext(request, response);
             return;
@@ -82,7 +100,7 @@ public class TokenExchangePolicy {
         var issuedFor = getIncomingTokenIssuedFor(context);
         if (issuedFor == null || issuedFor.isBlank()) {
             if (LOG.isWarnEnabled()) {
-                LOG.warn("Incoming Bearer token is invalid: authorized party ('azp') claim is missing or blank");
+                LOG.warn("Incoming Bearer token has no authorized party (claim 'azp') specified");
             }
             policyChain.doNext(request, response);
             return;
@@ -91,10 +109,46 @@ public class TokenExchangePolicy {
         var authorizedPartyPrefix = configuration.getAuthorizedPartyPrefix();
         if (!issuedFor.startsWith(authorizedPartyPrefix)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Incoming Bearer token is invalid: authorized party ('azp') does not match the configured prefix '{}'", authorizedPartyPrefix);
+                LOG.debug("Incoming Bearer token has an authorized party (claim 'azp') not matching the configured prefix '{}'", authorizedPartyPrefix);
             }
             policyChain.doNext(request, response);
             return;
+        }
+
+        var matchingAudience = configuration.getMatchingAudience();
+        if (matchingAudience != null && !matchingAudience.isBlank()) {
+            var audiences = getIncomingTokenAudiences(context);
+            if (!audiences.contains(matchingAudience)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Incoming Bearer token does not contain the audience '{}'", matchingAudience);
+                }
+                policyChain.doNext(request, response);
+                return;
+            }
+        }
+
+        var notMatchingAudience = configuration.getNotMatchingAudience();
+        if (notMatchingAudience != null && !notMatchingAudience.isBlank()) {
+            var audiences = getIncomingTokenAudiences(context);
+            if (audiences.contains(notMatchingAudience)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Incoming Bearer token does already contain the audience '{}'", notMatchingAudience);
+                }
+                policyChain.doNext(request, response);
+                return;
+            }
+        }
+
+        var notMatchingScope = configuration.getNotMatchingScope();
+        if (notMatchingScope != null && !notMatchingScope.isBlank()) {
+            var scopes = getIncomingTokenScopes(context);
+            if (scopes.contains(notMatchingScope)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Incoming Bearer token does already contain the scope '{}'", notMatchingScope);
+                }
+                policyChain.doNext(request, response);
+                return;
+            }
         }
 
         var targetScope = configuration.getTargetScope();
@@ -108,10 +162,10 @@ public class TokenExchangePolicy {
             return;
         }
 
-        handleTokenExchange(request, response, context, policyChain, incomingToken, targetScope);
+        handleTokenExchange(request, response, context, policyChain, incomingToken);
     }
 
-    private void handleTokenExchange(Request request, Response response, ExecutionContext context, PolicyChain policyChain, String incomingToken, String targetScope) {
+    private void handleTokenExchange(Request request, Response response, ExecutionContext context, PolicyChain policyChain, String incomingToken) {
 
         var options = new HttpClientOptions()
                 .setSsl(false)
@@ -122,17 +176,17 @@ public class TokenExchangePolicy {
                 .getComponent(Vertx.class)
                 .createHttpClient(options);
 
-        var form = "grant_type=" + encode("urn:ietf:params:oauth:grant-type:token-exchange")
-                + "&client_id=" + encode("api-gateway")
-                + "&client_secret=" + encode("api-gateway")
+        var form = "grant_type=" + ENCODED_GRANT_TYPE_FOR_TOKEN_EXCHANGE
+                + "&client_id=" + encode(configuration.getTokenExchangeClientId())
+                + "&client_secret=" + encode(configuration.getTokenExchangeClientSecret())
                 + "&subject_token=" + encode(incomingToken)
-                + "&subject_token_type=" + encode("urn:ietf:params:oauth:token-type:access_token")
-                + "&requested_token_type=" + encode("urn:ietf:params:oauth:token-type:access_token")
-                + "&scope=" + encode(targetScope);
+                + "&subject_token_type=" + ENCODED_TOKEN_TYPE_FOR_ACCESS_TOKEN
+                + "&requested_token_type=" + ENCODED_TOKEN_TYPE_FOR_ACCESS_TOKEN
+                + "&scope=" + encode(configuration.getTargetScope());
 
         var requestOpts = new RequestOptions()
                 .setMethod(HttpMethod.POST)
-                .setAbsoluteURI(TOKEN_EXCHANGE_URL)
+                .setAbsoluteURI(configuration.getTokenEndpointUrl())
                 .putHeader("Content-Type", "application/x-www-form-urlencoded")
                 .putHeader("Content-Length", String.valueOf(form.length()));
 
@@ -140,7 +194,7 @@ public class TokenExchangePolicy {
                 .onFailure(throwable -> handleFailure(policyChain, httpClient, throwable))
                 .onSuccess(httpClientRequest -> { // Connection established, lets continue
                     httpClientRequest.send(Buffer.buffer(form))
-                            .onSuccess(httpResponse -> handleSuccess(httpResponse, request, response, policyChain, httpClient, incomingToken, targetScope))
+                            .onSuccess(httpResponse -> handleSuccess(httpResponse, request, response, policyChain, httpClient, incomingToken))
                             .onFailure(throwable -> handleFailure(policyChain, httpClient, throwable));
                 });
     }
@@ -151,8 +205,7 @@ public class TokenExchangePolicy {
             Response response,
             PolicyChain policyChain,
             HttpClient httpClient,
-            String incomingToken,
-            String targetScope
+            String incomingToken
     ) {
         httpResponse.bodyHandler(body -> {
             try {
@@ -170,7 +223,7 @@ public class TokenExchangePolicy {
                     return;
                 }
 
-                putTokenInCache(incomingToken, targetScope, newToken);
+                putTokenInCache(incomingToken, configuration.getTargetScope(), newToken);
                 setAuthorizationTokenForRequest(request, newToken);
                 policyChain.doNext(request, response);
 
@@ -211,6 +264,34 @@ public class TokenExchangePolicy {
         }
 
         return issuedFor.toString();
+    }
+
+    private Collection<String> getIncomingTokenAudiences(ExecutionContext context) {
+        var claims = context.getAttribute("jwt.claims");
+        if (!(claims instanceof Map<?, ?> map)) {
+            return List.of();
+        }
+
+        var audiences = map.get("aud");
+        if (!(audiences instanceof Collection<?> coll)) {
+            return List.of();
+        }
+
+        return (Collection<String>) coll;
+    }
+
+    private Collection<String> getIncomingTokenScopes(ExecutionContext context) {
+        var claims = context.getAttribute("jwt.claims");
+        if (!(claims instanceof Map<?, ?> map)) {
+            return List.of();
+        }
+
+        var audiences = map.get("scope");
+        if (!(audiences instanceof Collection<?> coll)) {
+            return List.of();
+        }
+
+        return (Collection<String>) coll;
     }
 
     private String getTokenFromCache(String incomingToken, String targetScope) {
