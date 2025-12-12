@@ -313,12 +313,12 @@ public class TokenExchangePolicy {
             return List.of();
         }
 
-        var audiences = map.get("scope");
-        if (!(audiences instanceof Collection<?> coll)) {
+        var scopes = map.get("scope");
+        if (!(scopes instanceof String scopesString)) {
             return List.of();
         }
 
-        return (Collection<String>) coll;
+        return List.of(scopesString.split(" "));
     }
 
     private String getTokenFromCache(String incomingToken, String targetScope) {
@@ -356,7 +356,7 @@ public class TokenExchangePolicy {
     }
 
     private static String encode(String s) {
-        return URLEncoder.encode(s, StandardCharsets.UTF_8);
+        return s == null ? null : URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
     private void logDebug(String msg, Object... args) {
