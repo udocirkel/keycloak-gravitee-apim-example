@@ -3,19 +3,53 @@
   "type": "object",
   "id": "urn:jsonschema:de:udocirkel:example:kcgravitee:gravitee:policy:TokenExchangePolicyConfiguration",
   "properties": {
+    "tokenEndpointUrl": {
+      "title": "Token Endpoint URL",
+      "description": "URL of the token endpoint used to perform the token exchange.",
+      "type": "string",
+      "format": "uri"
+    },
+    "tokenExchangeClientId": {
+      "title": "Token Exchange Client ID",
+      "description": "Client ID used to authenticate against the token endpoint during the token exchange.",
+      "type": "string"
+    },
+    "tokenExchangeClientSecret": {
+      "title": "Token Exchange Client Secret",
+      "description": "Client secret used to authenticate against the token endpoint during the token exchange.",
+      "type": "string"
+    },
     "authorizedPartyPrefix": {
       "title": "Authorized Party Prefix",
-      "description": "Prefix of the authorized party of the incoming token that must match in order for an OIDC Token Exchange to be performed.",
+      "description": "Prefix of the \"authorized party\" (azp) claim in the incoming token. The token exchange is allowed only if the azp claim starts with this prefix. Use case: Ensures that the incoming token was issued for a client that is permitted to perform a token exchange. For example, only tokens that contain the audience \"api-gateway\".",
       "type": "string",
       "default": "coffee-app-"
     },
+    "matchingAudience": {
+      "title": "Matching Audience",
+      "description": "Audience that must be present in the incoming token for the token exchange to succeed. Use case: Ensures that the incoming token was issued for a client that is permitted to perform a token exchange. For example, only tokens that contain the audience \"api-gateway\".",
+      "type": "string"
+    },
+    "notMatchingAudience": {
+      "title": "Not-matching Audience",
+      "description": "Audience that must NOT be present in the incoming token for the token exchange to succeed. Use case: Prevents token exchanges for incoming tokens that already have the permissions represented by the given audience.",
+      "type": "string"
+    },
+    "notMatchingScope": {
+      "title": "Not-matching Scope",
+      "description": "Scope that must NOT be present in the incoming token for the token exchange to succeed. Use case: Prevents token exchanges for incoming tokens that already have the permissions represented by the given scope.",
+      "type": "string"
+    },
     "targetScope": {
       "title": "Target Scope",
-      "description": "Scope parameter for the OIDC token exchange.",
+      "description": "Scope to request for the newly created token after the exchange. Use case: Defines which permissions the newly issued token (result of the token exchange) should have.",
       "type": "string"
     }
   },
   "required": [
+    "tokenEndpointUrl",
+    "tokenExchangeClientId",
+    "tokenExchangeClientSecret",
     "authorizedPartyPrefix",
     "targetScope"
   ]
