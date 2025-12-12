@@ -74,7 +74,22 @@ public class TokenExchangePolicy {
     /**
      * The associated configuration to this TokenExchange Policy
      */
-    private TokenExchangePolicyConfiguration configuration;
+    private final TokenExchangePolicyConfiguration configuration;
+
+    /**
+     * Encoded client ID for token exchange
+     */
+    private final String encodedTokenExchangeClientId;
+
+    /**
+     * Encoded client secret for token exchange
+     */
+    private final String encodedTokenExchangeClientSecret;
+
+    /**
+     * Url encoded target scope for token exchange
+     */
+    private final String encodedTargetScope;
 
     /**
      * Create a new TokenExchange Policy instance based on its associated configuration
@@ -83,86 +98,98 @@ public class TokenExchangePolicy {
      */
     public TokenExchangePolicy(TokenExchangePolicyConfiguration configuration) {
         this.configuration = configuration;
+        this.encodedTokenExchangeClientId = encode(configuration.getTokenExchangeClientId());
+        this.encodedTokenExchangeClientSecret = encode(configuration.getTokenExchangeClientSecret());
+        this.encodedTargetScope = encode(configuration.getTargetScope());
     }
 
     @OnRequest
     public void onRequest(Request request, Response response, ExecutionContext context, PolicyChain policyChain) {
-
+        Runnable chainDoNext = () -> policyChain.doNext(request, response);
         var incomingToken = getIncomingToken(context);
-        if (incomingToken == null || incomingToken.isBlank()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Request has no Authorization header with Bearer token");
-            }
-            policyChain.doNext(request, response);
-            return;
-        }
+        if (invalidToken(incomingToken, chainDoNext)) return;
+        if (authorizedPartyPrefixNotMatching(context, chainDoNext)) return;
+        if (audienceNotMatching(context, chainDoNext)) return;
+        if (audienceMatching(context, chainDoNext)) return;
+        if (scopeMatching(context, chainDoNext)) return;
+        if (setTokenFromCacheSuccessful(incomingToken, request, chainDoNext)) return;
+        handleTokenExchange(request, response, context, policyChain, incomingToken);
+    }
 
+    private boolean invalidToken(String incomingToken, Runnable chainDoNext) {
+        if (incomingToken == null || incomingToken.isBlank()) {
+            logDebug("Request has no Authorization header with Bearer token");
+            chainDoNext.run();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean authorizedPartyPrefixNotMatching(ExecutionContext context, Runnable chainDoNext) {
+        var authorizedPartyPrefix = configuration.getAuthorizedPartyPrefix();
         var issuedFor = getIncomingTokenIssuedFor(context);
         if (issuedFor == null || issuedFor.isBlank()) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Incoming Bearer token has no authorized party (claim 'azp') specified");
-            }
-            policyChain.doNext(request, response);
-            return;
+            logWarn("Incoming Bearer token has no authorized party (claim 'azp') specified");
+            chainDoNext.run();
+            return true;
         }
-
-        var authorizedPartyPrefix = configuration.getAuthorizedPartyPrefix();
         if (!issuedFor.startsWith(authorizedPartyPrefix)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Incoming Bearer token has an authorized party (claim 'azp') not matching the configured prefix '{}'", authorizedPartyPrefix);
-            }
-            policyChain.doNext(request, response);
-            return;
+            logDebug("Incoming Bearer token has an authorized party (claim 'azp') not matching the configured prefix '{}'", authorizedPartyPrefix);
+            chainDoNext.run();
+            return true;
         }
+        return false;
+    }
 
+    private boolean audienceNotMatching(ExecutionContext context, Runnable chainDoNext) {
         var matchingAudience = configuration.getMatchingAudience();
         if (matchingAudience != null && !matchingAudience.isBlank()) {
             var audiences = getIncomingTokenAudiences(context);
             if (!audiences.contains(matchingAudience)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Incoming Bearer token does not contain the audience '{}'", matchingAudience);
-                }
-                policyChain.doNext(request, response);
-                return;
+                logDebug("Incoming Bearer token does not contain the audience '{}'", matchingAudience);
+                chainDoNext.run();
+                return true;
             }
         }
+        return false;
+    }
 
+    private boolean audienceMatching(ExecutionContext context, Runnable chainDoNext) {
         var notMatchingAudience = configuration.getNotMatchingAudience();
         if (notMatchingAudience != null && !notMatchingAudience.isBlank()) {
             var audiences = getIncomingTokenAudiences(context);
             if (audiences.contains(notMatchingAudience)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Incoming Bearer token does already contain the audience '{}'", notMatchingAudience);
-                }
-                policyChain.doNext(request, response);
-                return;
+                logDebug("Incoming Bearer token does already contain the audience '{}'", notMatchingAudience);
+                chainDoNext.run();
+                return true;
             }
         }
+        return false;
+    }
 
+    private boolean scopeMatching(ExecutionContext context, Runnable chainDoNext) {
         var notMatchingScope = configuration.getNotMatchingScope();
         if (notMatchingScope != null && !notMatchingScope.isBlank()) {
             var scopes = getIncomingTokenScopes(context);
             if (scopes.contains(notMatchingScope)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Incoming Bearer token does already contain the scope '{}'", notMatchingScope);
-                }
-                policyChain.doNext(request, response);
-                return;
+                logDebug("Incoming Bearer token does already contain the scope '{}'", notMatchingScope);
+                chainDoNext.run();
+                return true;
             }
         }
+        return false;
+    }
 
+    private boolean setTokenFromCacheSuccessful(String incomingToken, Request request, Runnable chainDoNext) {
         var targetScope = configuration.getTargetScope();
         var tokenFromCache = getTokenFromCache(incomingToken, targetScope);
         if (tokenFromCache != null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Cached token found for incoming Bearer token and target scope '{}': {}", targetScope, tokenFromCache);
-            }
+            logDebug("Cached token found for incoming Bearer token and target scope '{}': {}", targetScope, tokenFromCache);
             setAuthorizationTokenForRequest(request, tokenFromCache);
-            policyChain.doNext(request, response);
-            return;
+            chainDoNext.run();
+            return true;
         }
-
-        handleTokenExchange(request, response, context, policyChain, incomingToken);
+        return false;
     }
 
     private void handleTokenExchange(Request request, Response response, ExecutionContext context, PolicyChain policyChain, String incomingToken) {
@@ -177,12 +204,12 @@ public class TokenExchangePolicy {
                 .createHttpClient(options);
 
         var form = "grant_type=" + ENCODED_GRANT_TYPE_FOR_TOKEN_EXCHANGE
-                + "&client_id=" + encode(configuration.getTokenExchangeClientId())
-                + "&client_secret=" + encode(configuration.getTokenExchangeClientSecret())
+                + "&client_id=" + encodedTokenExchangeClientId
+                + "&client_secret=" + encodedTokenExchangeClientSecret
                 + "&subject_token=" + encode(incomingToken)
                 + "&subject_token_type=" + ENCODED_TOKEN_TYPE_FOR_ACCESS_TOKEN
                 + "&requested_token_type=" + ENCODED_TOKEN_TYPE_FOR_ACCESS_TOKEN
-                + "&scope=" + encode(configuration.getTargetScope());
+                + "&scope=" + encodedTargetScope;
 
         var requestOpts = new RequestOptions()
                 .setMethod(HttpMethod.POST)
@@ -205,8 +232,8 @@ public class TokenExchangePolicy {
             Response response,
             PolicyChain policyChain,
             HttpClient httpClient,
-            String incomingToken
-    ) {
+            String incomingToken) {
+
         httpResponse.bodyHandler(body -> {
             try {
 
@@ -330,6 +357,18 @@ public class TokenExchangePolicy {
 
     private static String encode(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
+    }
+
+    private void logDebug(String msg, Object... args) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(msg, args);
+        }
+    }
+
+    private void logWarn(String msg, Object... args) {
+        if (LOG.isWarnEnabled()) {
+            LOG.warn(msg, args);
+        }
     }
 
 }
