@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.udocirkel.example.kcgravitee;
+package de.udocirkel.example.kcgravitee.gravitee.policy;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -22,11 +22,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.udocirkel.example.kcgravitee.gravitee.policy.TokenExchangePolicy;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import java.util.Map;
 
-import de.udocirkel.example.kcgravitee.gravitee.policy.TokenExchangePolicyConfiguration;
 import io.gravitee.apim.gateway.tests.sdk.AbstractPolicyTest;
 import io.gravitee.apim.gateway.tests.sdk.annotations.DeployApi;
 import io.gravitee.apim.gateway.tests.sdk.annotations.GatewayTest;
