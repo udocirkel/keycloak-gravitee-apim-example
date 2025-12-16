@@ -28,7 +28,7 @@ forwards them to backend services.
 ├── http-test/                  # Demo REST API calls
 │
 ├── pom.xml                     # Maven build for extensions and container images
-├── setup.txt                   # Instructions for initial manual configuration
+├── setup.md                    # Manual steps for the initial setup of the example
 │
 ├── docker-compose.yml          # Full local environment (Keycloak + Gravitee + services)
 ├── docker-compose-kc.yml       # Keycloak-only local environment (Keycloak + services)
@@ -76,7 +76,7 @@ mvn clean verify
 
 ### **Initialize environment (only on first run)**
 
-Manually execute the steps described in `setup.txt`.
+Manually execute the steps described in `setup.md`.
 
 ### **Stop environment**
 
