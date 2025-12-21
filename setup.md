@@ -66,8 +66,8 @@ Select `Next`.
 
 Set:
 * `JWKS resolver` = `JWKS_URL`
-* `Extract JWT Claims` = `true`
 * `Resolver parameter` = `http://keycloak:8080/realms/coffeehouse/protocol/openid-connect/certs`
+* `Extract JWT Claims` = `true`
 * `Propagate Authorization header` = `true`
 * `Client ID claim` = `azp`
 * `Ignore missing CNF` = `true`
@@ -135,6 +135,50 @@ Select `Coffee Order API` / `JWT plan` / `Create`.
 In the `Coffee Menu API (1.0.0)` menu, go to `Consumers` / `Subscriptions`.  
 Select the action `Edit the subscription`.  
 Select the action `Validate subscription` / `Validate`.
+
+In the `Coffee Order API (1.0.0)` menu, go to `Consumers` / `Subscriptions`.  
+Select the action `Edit the subscription`.  
+Select the action `Validate subscription` / `Validate`.
+
+### Configure Application for Coffee App 123
+
+In the menu, go to `Applications`.
+
+Select `+ Add Application`.
+
+Set:
+* `Name` = `Coffee App 123`
+* `Description` = `Coffee App 123`
+* `Client ID` = `coffee-app-123`
+
+Select `Create`.
+
+In the `Coffee App 123` menu, go to `Subscriptions`.
+
+Select `+ Create a subscription`.  
+Select `Coffee Menu API` / `JWT plan` / `Create`.  
+
+In the `Coffee Menu API (1.0.0)` menu, go to `Consumers` / `Subscriptions`.  
+Select the action `Edit the subscription`.  
+Select the action `Validate subscription` / `Validate`.
+
+### Configure Application for Coffee App 234
+
+In the menu, go to `Applications`.
+
+Select `+ Add Application`.
+
+Set:
+* `Name` = `Coffee App 234`
+* `Description` = `Coffee App 234`
+* `Client ID` = `coffee-app-234`
+
+Select `Create`.
+
+In the `Coffee App 234` menu, go to `Subscriptions`.
+
+Select `+ Create a subscription`.  
+Select `Coffee Order API` / `JWT plan` / `Create`.
 
 In the `Coffee Order API (1.0.0)` menu, go to `Consumers` / `Subscriptions`.  
 Select the action `Edit the subscription`.  

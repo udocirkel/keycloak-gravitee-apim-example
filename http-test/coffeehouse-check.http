@@ -1,3 +1,5 @@
+# IntelliJ IDEA Ultimate is required to properly process HTTP responses and persist access tokens between requests.
+
 
 ### Obtain token for COFFEE-APP-123
 POST {{ISSUER_URL}}/protocol/openid-connect/token
@@ -96,10 +98,10 @@ scope = coffee-order-api
 %}
 
 
-########################################################################
-####  COFFEEHOUSE ENDPUNKTE DIREKT ABFRAGEN
-####  => Coffee Ingredient API, Coffe Menu API, Coffee Order API
-########################################################################
+# #######################################################################
+# ###  Call COFFEEHOUSE services directly
+# ###  => Coffee Ingredient API, Coffe Menu API, Coffee Order API
+# #######################################################################
 
 
 ### Ingredients: Espresso Zutatenliste abfragen
@@ -138,10 +140,10 @@ Authorization: Bearer {{ACCESS_TOKEN}}
 Accept: application/json
 
 
-########################################################################
-####  COFFEEHOUSE ENDPUNKTE ÜBER API-GATEWAY ABFRAGEN
-####  => Coffe Menu API, Coffee Order API
-########################################################################
+# #######################################################################
+# ###  Call COFFEEHOUSE services through the API Gateway
+# ###  => Coffe Menu API, Coffee Order API
+# #######################################################################
 
 
 ### Menu: Latte Produkt über API-Gateway abfragen
