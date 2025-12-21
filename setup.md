@@ -66,8 +66,8 @@ Select `Next`.
 
 Set:
 * `JWKS resolver` = `JWKS_URL`
-* `Extract JWT Claims` = `true`
 * `Resolver parameter` = `http://keycloak:8080/realms/coffeehouse/protocol/openid-connect/certs`
+* `Extract JWT Claims` = `true`
 * `Propagate Authorization header` = `true`
 * `Client ID claim` = `azp`
 * `Ignore missing CNF` = `true`
