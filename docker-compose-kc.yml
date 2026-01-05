@@ -40,9 +40,9 @@ services:
     networks: [coffeehouse]
     command: ["start-dev", "--import-realm"]
 
-  ##########################
-  ###  COFFEEHOUSE APIS  ###
-  ##########################
+  ##############################
+  ###  COFFEEHOUSE SERVICES  ###
+  ##############################
 
   coffee-ingredient-service:
     image: udocirkel/kcgravitee-example/coffee-ingredient-service:1.0.0

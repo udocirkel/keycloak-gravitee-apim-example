@@ -129,6 +129,7 @@ http-test/coffeehouse-check.http
 
 This script can be executed with an HTTP client that supports `.http` files, such as the built-in HTTP client in
 IntelliJ IDEA or VS Code (REST Client extension).
+Open the file in your editor and execute the requests.
 
 The test script performs the complete end-to-end flow:
 
@@ -137,8 +138,6 @@ The test script performs the complete end-to-end flow:
 3. Verify the Phantom Token Pattern, where Gravitee validates the opaque token, exchanges it for a JWT access token, and
    forwards the request to the API backend.
 4. Receive a processed response from the API backend.
-
-Open the file in your editor and execute the requests.
 
 ---
 

@@ -2,10 +2,6 @@ networks:
   coffeehouse:
     driver: bridge
 
-volumes:
-  mongodb_data:
-  elastic_data:
-
 services:
 
   # Keycloak                            => http://localhost:8080
@@ -177,9 +173,9 @@ services:
       - ./nginx/config/nginx_portal.conf:/etc/nginx/nginx.conf:ro
     networks: [coffeehouse]
 
-  ##########################
-  ###  COFFEEHOUSE APIS  ###
-  ##########################
+  ##############################
+  ###  COFFEEHOUSE SERVICES  ###
+  ##############################
 
   coffee-ingredient-service:
     image: udocirkel/kcgravitee-example/coffee-ingredient-service:1.0.0
