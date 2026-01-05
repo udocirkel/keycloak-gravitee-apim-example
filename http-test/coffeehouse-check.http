@@ -1,4 +1,5 @@
 # IntelliJ IDEA Ultimate is required to properly process HTTP responses and persist access tokens between requests.
+# With IntelliJ IDEA Community you may set the required env variables (e.g. ACCESS_TOKEN) manually in http-client.env.json.
 
 
 ### Obtain token for COFFEE-APP-123
@@ -98,10 +99,10 @@ scope = coffee-order-api
 %}
 
 
-# #######################################################################
-# ###  Call COFFEEHOUSE services directly
-# ###  => Coffee Ingredient API, Coffe Menu API, Coffee Order API
-# #######################################################################
+########################################################################
+###  Call COFFEEHOUSE services directly
+###  => Coffee Ingredient API, Coffe Menu API, Coffee Order API
+########################################################################
 
 
 ### Ingredients: Espresso Zutatenliste abfragen
@@ -140,10 +141,10 @@ Authorization: Bearer {{ACCESS_TOKEN}}
 Accept: application/json
 
 
-# #######################################################################
-# ###  Call COFFEEHOUSE services through the API Gateway
-# ###  => Coffe Menu API, Coffee Order API
-# #######################################################################
+########################################################################
+###  Call COFFEEHOUSE services through the API Gateway
+###  => Coffe Menu API, Coffee Order API
+########################################################################
 
 
 ### Menu: Latte Produkt über API-Gateway abfragen
