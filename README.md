@@ -13,9 +13,7 @@ The example includes all required configurations and extensions in both Keycloak
 It shows how Gravitee validates incoming opaque tokens, exchanges them for JWT access tokens, caches these tokens, and
 forwards them to backend services.
 
----
-
-⚠️ Disclaimer
+**⚠️ Disclaimer**
 
 This project is intended for demonstration, learning, and hands-on experimentation and does not provide a production-
 ready setup. It shows concepts and integrations in a simplified local environment. 
