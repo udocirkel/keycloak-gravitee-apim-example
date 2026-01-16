@@ -15,6 +15,16 @@ forwards them to backend services.
 
 ---
 
+⚠️ Disclaimer
+
+This project is intended for demonstration, learning, and hands-on experimentation and does not provide a production-
+ready setup. It shows concepts and integrations in a simplified local environment. 
+
+With additional hardening, configuration, and operational considerations, the demonstrated concepts can serve as a
+solid foundation for real-world deployments.
+
+---
+
 ## 📦 Project Structure
 
 ```
