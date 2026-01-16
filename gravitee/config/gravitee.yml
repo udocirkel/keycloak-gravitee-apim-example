@@ -29,3 +29,20 @@ repositories:
 # HTTP Server (optional)
 http:
   port: 8082
+
+services:
+
+  # Internal management port and authentication
+  core:
+    http:
+      enabled: true
+      host: 0.0.0.0    # allows access from host/other containers; prevents "Empty reply from server"
+      port: 18082
+      authentication:
+        type: none     # Community Edition: Basic Auth is not supported on internal API
+
+  # Enable the metrics service
+  metrics:
+    enabled: true
+    prometheus:
+      enabled: true

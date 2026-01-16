@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo ""
-echo "Stopping Keycloak, Coffee Service, Gravitee APIM containers"
-echo "-----------------------------------------------------------"
+echo "Stopping Keycloak, Gravitee APIM, Tools, Coffee Services"
+echo "--------------------------------------------------------"
 docker compose down
 
 echo ""

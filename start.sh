@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo ""
-echo "Starting Keycloak, Coffee Service, Gravitee APIM containers"
-echo "-----------------------------------------------------------"
+echo "Starting Keycloak, Gravitee APIM, Tools, Coffee Services"
+echo "--------------------------------------------------------"
 docker compose up -d
 
 echo ""
