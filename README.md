@@ -21,16 +21,21 @@ forwards them to backend services.
 ├── keycloak/                   # Keycloak component with preconfigured realm and clients 
 ├── gravitee/                   # Gravitee Gateway & APIM components
 ├── nginx/                      # Reverse proxy configuration for Gravitee components
+├── prometheus/                 # Prometheus scrape configuration
+├── grafana/                    # Grafana datasources
 ├── coffeehouse/                # Example services (OAuth2 resource server)
 │   ├── coffee-ingredient-service/  # Spring WebFlux based service (server)
 │   ├── coffee-menu-service/        # Spring WebFlux based service (server + web client)
 │   └── coffee-order-service/       # Spring Web based service (server) using WebFlux (web client) 
+│
+├── data/                       # Persistent runtime data (Docker volumes / bind mounts)
+│
 ├── http-test/                  # Demo REST API calls
 │
 ├── pom.xml                     # Maven build for extensions and container images
 ├── setup.md                    # Manual steps for the initial setup of the example
 │
-├── docker-compose.yml          # Full local environment (Keycloak + Gravitee + services)
+├── docker-compose.yml          # Full local environment (Keycloak + Gravitee + Tools + services)
 ├── docker-compose-kc.yml       # Keycloak-only local environment (Keycloak + services)
 ├── start.sh                    # Start full local environment
 ├── stop.sh                     # Stop full local environment
@@ -109,10 +114,13 @@ This example demonstrates the complete flow:
 | Service                                 | URL                                                                                       |
 |-----------------------------------------|-------------------------------------------------------------------------------------------|
 | **Keycloak Admin Console**              | http://localhost:8080                                                                     |
-| **Gravitee API Gateway**                | http://localhost:8082                                                                     |
+| **Gravitee API Gateway APIs**           | http://localhost:8082                                                                     |
+| **Gravitee API Gateway Metrics**        | http://localhost:18082                                                                    |
 | **Gravitee Management API**             | http://localhost:8083                                                                     |
 | **Gravitee Management Console (nginx)** | http://localhost:8084                                                                     |
 | **Gravitee Developer Portal (nginx)**   | http://localhost:8085                                                                     |
+| **Prometheus**                          | http://localhost:9090                                                                     |
+| **Grafana**                             | http://localhost:3000                                                                     |
 | **Coffee Order Service**                | gateway:<br/>http://localhost:8082/coffee-order-api<br/>direct:<br/>http://localhost:8089 |
 | **Coffee Menu Service**                 | gateway:<br/>http://localhost:8082/coffee-menu-api<br/>direct:<br/>http://localhost:8088  |
 | **Coffee Ingredient Service**           | only direct:<br/>http://localhost:8087                                                    |

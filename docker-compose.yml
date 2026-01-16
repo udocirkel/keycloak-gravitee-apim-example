@@ -5,13 +5,16 @@ networks:
 services:
 
   # Keycloak                            => http://localhost:8080
-  # Gravitee API Gateway                => http://localhost:8082
+  # Gravitee API Gateway APIs           => http://localhost:8082
+  # Gravitee API Gateway Metrics        => http://localhost:18082
   # Gravitee Management API             => http://localhost:8083
   # Gravitee Management Console (nginx) => http://localhost:8084
   # Gravitee Developer Portal (nginx)   => http://localhost:8085
   # Coffee Ingredient Service           => http://localhost:8087
   # Coffee Menu Service                 => http://localhost:8088
   # Coffee Order Service                => http://localhost:8089
+  # Prometheus                          => http://localhost:9090
+  # Grafana                             => http://localhost:3000
 
   ##############################
   ###  AUTHORIZATION SERVER  ###
@@ -57,7 +60,7 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ./data/mongodb_data:/data/db
+      - ./data/mongodb:/data/db
     networks: [coffeehouse]
 
   elasticsearch:
@@ -80,7 +83,7 @@ services:
       memlock: { soft: -1, hard: -1 }
       nofile: { soft: 65536, hard: 65536 }
     volumes:
-      - ./data/elastic_data:/usr/share/elasticsearch/data
+      - ./data/elastic:/usr/share/elasticsearch/data
     networks: [coffeehouse]
 
   management_api:
@@ -145,6 +148,7 @@ services:
       - gravitee_management_http_url=http://management_api:8083/management/organizations/DEFAULT/environments/DEFAULT/
     ports:
       - "8082:8082"
+      - "18082:18082"
     volumes:
       - ./gravitee/config/gravitee.yml:/opt/graviteeio-gateway/config/gravitee.yml:ro
     networks: [coffeehouse]
@@ -171,6 +175,30 @@ services:
       - "8085:80"
     volumes:
       - ./nginx/config/nginx_portal.conf:/etc/nginx/nginx.conf:ro
+    networks: [coffeehouse]
+
+  ####################
+  ###  MONITORING  ###
+  ####################
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./data/prometheus:/prometheus
+    networks: [coffeehouse]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./grafana/config/datasources:/etc/grafana/provisioning/datasources:ro
     networks: [coffeehouse]
 
   ##############################
