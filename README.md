@@ -41,7 +41,7 @@ solid foundation for real-world deployments.
 ├── http-test/                  # Demo REST API calls
 │
 ├── pom.xml                     # Maven build for extensions and container images
-├── setup.md                    # Manual steps for the initial setup of the example
+├── SETUP.md                    # Manual steps for the initial setup of the example
 │
 ├── docker-compose.yml          # Full local environment (Keycloak + Gravitee + Tools + services)
 ├── docker-compose-kc.yml       # Keycloak-only local environment (Keycloak + services)
@@ -89,7 +89,7 @@ mvn clean verify
 
 ### **Initialize environment (only on first run)**
 
-Manually execute the steps described in `setup.md`.
+Manually execute the steps described in `SETUP.md`.
 
 ### **Stop environment**
 

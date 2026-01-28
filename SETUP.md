@@ -85,7 +85,7 @@ Under `Plan: JWT plan` / `Request phase`, add the `Token Exchange` policy and se
 * `Token Exchange Client Secret` = `api-gateway`
 * `Authorized Party Prefix` = `coffee-app-`
 * `Matching Audience` = `api-gateway`
-* `Not-matching Audience` = ``
+* `Not-matching Audience` = `coffee-menu-api`
 * `Not-matching Scope` = ``
 * `Target Scope` = `coffee-menu-api`
 
