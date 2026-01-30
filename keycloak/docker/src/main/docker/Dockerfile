@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:26.4.0
+FROM quay.io/keycloak/keycloak:26.5.0
 WORKDIR /opt/keycloak
 COPY maven/example-kcgravitee-keycloak-extension-*.jar /opt/keycloak/providers/
 RUN bin/kc.sh build

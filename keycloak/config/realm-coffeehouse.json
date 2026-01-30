@@ -1466,7 +1466,8 @@
         "include.in.token.scope": "false",
         "display.on.consent.screen": "false",
         "gui.order": "",
-        "consent.screen.text": ""
+        "consent.screen.text": "",
+        "include.in.openid.provider.metadata": "false"
       },
       "protocolMappers": [
         {
@@ -1565,7 +1566,8 @@
         "include.in.token.scope": "false",
         "display.on.consent.screen": "false",
         "gui.order": "",
-        "consent.screen.text": ""
+        "consent.screen.text": "",
+        "include.in.openid.provider.metadata": "false"
       },
       "protocolMappers": [
         {
@@ -1633,7 +1635,8 @@
         "include.in.token.scope": "false",
         "display.on.consent.screen": "false",
         "gui.order": "",
-        "consent.screen.text": ""
+        "consent.screen.text": "",
+        "include.in.openid.provider.metadata": "false"
       },
       "protocolMappers": [
         {
@@ -3202,7 +3205,7 @@
     "frontendUrl": "",
     "acr.loa.map": "{}"
   },
-  "keycloakVersion": "26.4.0",
+  "keycloakVersion": "26.5.0",
   "userManagedAccessAllowed": false,
   "organizationsEnabled": false,
   "verifiableCredentialsEnabled": false,

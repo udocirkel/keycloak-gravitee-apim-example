@@ -24,7 +24,7 @@
 
                         <image>
                             <alias>test-keycloak</alias>
-                            <name>quay.io/keycloak/keycloak:26.4.0</name>
+                            <name>quay.io/keycloak/keycloak:26.5.0</name>
                             <run>
                                 <ports>
                                     <port>keycloak.port:8080</port>
