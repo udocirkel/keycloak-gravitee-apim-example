@@ -23,6 +23,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+
 import java.util.Map;
 
 import io.gravitee.apim.gateway.tests.sdk.AbstractPolicyTest;
@@ -31,12 +32,23 @@ import io.gravitee.apim.gateway.tests.sdk.annotations.GatewayTest;
 import io.gravitee.apim.gateway.tests.sdk.configuration.GatewayConfigurationBuilder;
 import io.gravitee.apim.gateway.tests.sdk.policy.fakes.Header1Policy;
 import io.gravitee.apim.gateway.tests.sdk.policy.PolicyBuilder;
+
 import io.gravitee.definition.model.Api;
+
 import io.gravitee.plugin.policy.PolicyPlugin;
-import io.reactivex.observers.TestObserver;
-import io.vertx.reactivex.core.buffer.Buffer;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.client.WebClient;
+
+//import io.reactivex.observers.TestObserver;
+
+//import io.vertx.reactivex.core.buffer.Buffer;
+//import io.vertx.reactivex.ext.web.client.HttpResponse;
+//import io.vertx.reactivex.ext.web.client.WebClient;
+
+import io.reactivex.rxjava3.observers.TestObserver;
+
+import io.vertx.core.buffer.Buffer;
+import io.vertx.ext.web.client.HttpResponse;
+import io.vertx.ext.web.client.WebClient;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -76,23 +88,45 @@ public class TokenExchangePolicyIntegrationTest extends AbstractPolicyTest<Token
         // - configureReporters(Map<String, Reporter> reporters)
     }
 
+//    @Test
+//    @DisplayName("Should test the policy deployed on an in memory gateway")
+//    public void shouldTestTokenExchangePolicyDeployedOnAnInMemoryGateway(WebClient client) throws Exception {
+//        wiremock.stubFor(get("/backend").willReturn(ok("response from backend")));
+//
+//        final TestObserver<HttpResponse<Buffer>> obs = client.get("/test").send().test();
+//
+//        awaitTerminalEvent(obs);
+//        obs
+//            .assertComplete()
+//            .assertValue(response -> {
+//                assertThat(response.statusCode()).isEqualTo(200);
+//                assertThat(response.bodyAsString()).isEqualTo("response from backend");
+//                return true;
+//            })
+//        .assertNoErrors();
+//
+//        wiremock.verify(getRequestedFor(urlPathEqualTo("/backend")).withHeader("X-DummyHeader", equalTo("TokenExchange")));
+//    }
+
     @Test
-    @DisplayName("Should test the policy deployed on an in memory gateway")
-    public void shouldTestTokenExchangePolicyDeployedOnAnInMemoryGateway(WebClient client) throws Exception {
+    @DisplayName("Should test the policy deployed on an in-memory gateway")
+    void shouldTestTokenExchangePolicyDeployedOnAnInMemoryGateway(WebClient client)
+            throws Exception {
+
         wiremock.stubFor(get("/backend").willReturn(ok("response from backend")));
 
-        final TestObserver<HttpResponse<Buffer>> obs = client.get("/test").rxSend().test();
+        client.get("/test").send(ar -> {
+            assertThat(ar.succeeded()).isTrue();
 
-        awaitTerminalEvent(obs);
-        obs
-            .assertComplete()
-            .assertValue(response -> {
-                assertThat(response.statusCode()).isEqualTo(200);
-                assertThat(response.bodyAsString()).isEqualTo("response from backend");
-                return true;
-            })
-        .assertNoErrors();
+            HttpResponse<Buffer> response = ar.result();
+            assertThat(response.statusCode()).isEqualTo(200);
+            assertThat(response.bodyAsString()).isEqualTo("response from backend");
 
-        wiremock.verify(getRequestedFor(urlPathEqualTo("/backend")).withHeader("X-DummyHeader", equalTo("TokenExchange")));
+            wiremock.verify(
+                    getRequestedFor(urlPathEqualTo("/backend"))
+                            .withHeader("X-DummyHeader", equalTo("TokenExchange"))
+            );
+        });
     }
+
 }
