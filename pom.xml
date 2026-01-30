@@ -20,8 +20,9 @@
         <java.version>21</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-
-        <docker-maven-plugin.version>0.46.0</docker-maven-plugin.version>
+        <!-- Plugins -->
+        <docker-maven-plugin.version>0.48.0</docker-maven-plugin.version>
+        <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
     </properties>
 
@@ -33,6 +34,11 @@
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>${docker-maven-plugin.version}</version>
                     <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${maven-assembly-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

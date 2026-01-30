@@ -20,27 +20,26 @@
 
     <properties>
         <!-- Libs -->
-        <caffeine.version>3.2.3</caffeine.version>
-        <gravitee.version>4.0.2</gravitee.version>
-        <lombok.version>1.18.42</lombok.version>
+        <gravitee-apim.version>4.10.2</gravitee-apim.version>
+        <gravitee-bom.version>8.3.47</gravitee-bom.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Import bom to properly inherit all dependencies -->
             <dependency>
-                <groupId>com.github.ben-manes.caffeine</groupId>
-                <artifactId>caffeine</artifactId>
-                <version>${caffeine.version}</version>
+                <groupId>io.gravitee.apim</groupId>
+                <artifactId>gravitee-apim-bom</artifactId>
+                <version>${gravitee-apim.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>io.gravitee.gateway</groupId>
-                <artifactId>gravitee-gateway-api</artifactId>
-                <version>${gravitee.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
+                <groupId>io.gravitee</groupId>
+                <artifactId>gravitee-bom</artifactId>
+                <version>${gravitee-bom.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
         </dependencies>
     </dependencyManagement>

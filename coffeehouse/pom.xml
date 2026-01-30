@@ -23,10 +23,10 @@
 
     <properties>
         <!-- Libs -->
-        <jackson-databind-nullable.version>0.2.7</jackson-databind-nullable.version>
-        <spring.boot.version>3.5.6</spring.boot.version>
-        <spring-security-oauth2-jose.version>6.5.6</spring-security-oauth2-jose.version>
-        <swagger-annotations.version>2.2.39</swagger-annotations.version>
+        <jackson-databind-nullable.version>0.2.8</jackson-databind-nullable.version>
+        <spring.boot.version>3.5.10</spring.boot.version>
+        <spring-security-oauth2-jose.version>6.5.7</spring-security-oauth2-jose.version>
+        <swagger-annotations.version>2.2.42</swagger-annotations.version>
         <!-- Plugins -->
         <openapi-generator-maven-plugin.version>7.4.0</openapi-generator-maven-plugin.version>
         <spring-boot-maven-plugin.version>${spring.boot.version}</spring-boot-maven-plugin.version>
