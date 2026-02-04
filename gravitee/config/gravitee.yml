@@ -44,5 +44,18 @@ services:
   # Enable the metrics service
   metrics:
     enabled: true
+    labels:
+      - local       # Local address in client-host or host-client connections (used in net, http and datagram domains)
+      - remote      # Remote address in client-host or host-client connections (used in net and http domains)      - http_code
+      - http_method # Method (GET, POST, PUT, etc.) of an HTTP requests (used in http domain)
+      - http_path   # Path of the URI for client or server requests (used in http domain)
+      - http_route  # Route as provided by routing modules to the http requests
+      - class_name  # When used in error counters (in net, http, datagram and eventbus domains) it relates to an exception that occurred. When used in verticle domain, it relates to the verticle class name.
+      - eb_address  # Event bus address
+      - eb_side     # Event bus side of the metric, it can be either "local" or "remote"
+      - eb_failure  # Event bus failure name from a ReplyFailure object
+      - namespace   # Client namespace
+      - pool_type   # Pool type, such as "worker" or "datasource" (used in pools domain)
+      - pool_name   # Pool name (used in pools domain)
     prometheus:
       enabled: true
