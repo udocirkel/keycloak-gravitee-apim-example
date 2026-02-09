@@ -1010,10 +1010,8 @@
         "email"
       ],
       "optionalClientScopes": [
-        "coffee-menu-api",
         "address",
         "phone",
-        "coffee-order-api",
         "organization",
         "offline_access",
         "microprofile-jwt"
@@ -2162,17 +2160,14 @@
     "roles",
     "web-origins",
     "acr",
-    "basic",
-    "coffee-app-basic"
+    "basic"
   ],
   "defaultOptionalClientScopes": [
     "offline_access",
     "address",
     "phone",
     "microprofile-jwt",
-    "organization",
-    "coffee-order-api",
-    "coffee-menu-api"
+    "organization"
   ],
   "browserSecurityHeaders": {
     "contentSecurityPolicyReportOnly": "",
