@@ -73,7 +73,7 @@ public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Fl
     }
 
     private GrantedAuthority toAuthority(Object role) {
-        return new SimpleGrantedAuthority(AUTHORITY_PREFIX + Objects.toString(role));
+        return new SimpleGrantedAuthority(AUTHORITY_PREFIX + role);
     }
 
 }
