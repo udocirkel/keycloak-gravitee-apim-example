@@ -51,4 +51,8 @@ public class OrderService {
         return List.copyOf(orders.values());
     }
 
+    void clearOrders() {
+        orders.clear();
+    }
+
 }

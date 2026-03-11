@@ -1,6 +1,9 @@
 package de.udocirkel.example.kcgravitee.coffeehouse.order;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -71,7 +74,7 @@ public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Co
     }
 
     private GrantedAuthority toAuthority(Object role) {
-        return new SimpleGrantedAuthority(AUTHORITY_PREFIX + Objects.toString(role));
+        return new SimpleGrantedAuthority(AUTHORITY_PREFIX + role);
     }
 
 }

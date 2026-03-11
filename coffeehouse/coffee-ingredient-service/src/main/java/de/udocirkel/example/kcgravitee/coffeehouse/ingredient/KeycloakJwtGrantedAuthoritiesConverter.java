@@ -1,6 +1,9 @@
 package de.udocirkel.example.kcgravitee.coffeehouse.ingredient;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Fl
         return Flux.merge(
                         // Default roles from converter
                         Flux.fromIterable(defaultConverter.convert(jwt)),
+                        // Flux.fromIterable(Optional.ofNullable(defaultConverter.convert(jwt)).orElse(java.util.List.of())),
                         // Realm roles
                         Flux.fromStream(getRealmRoles(jwt)).map(this::toAuthority),
                         // Client resource roles for provided audiences
@@ -72,7 +76,7 @@ public class KeycloakJwtGrantedAuthoritiesConverter implements Converter<Jwt, Fl
     }
 
     private GrantedAuthority toAuthority(Object role) {
-        return new SimpleGrantedAuthority(AUTHORITY_PREFIX + Objects.toString(role));
+        return new SimpleGrantedAuthority(AUTHORITY_PREFIX + role);
     }
 
 }

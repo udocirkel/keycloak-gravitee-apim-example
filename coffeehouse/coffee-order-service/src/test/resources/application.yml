@@ -1,0 +1,12 @@
+coffeehouse:
+  external:
+    menu-service:
+      url: http://localhost:9999  # dummy – wird durch @MockitoBean ersetzt
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          audiences: coffee-order-api
+          issuer-uri: http://localhost:9999/realms/test  # dummy – kein echter Keycloak nötig
