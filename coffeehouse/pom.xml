@@ -23,13 +23,13 @@
 
     <properties>
         <!-- Libs -->
-        <jackson-databind-nullable.version>0.2.9</jackson-databind-nullable.version>
-        <spring.boot.version>4.0.3</spring.boot.version>
-        <spring-security-oauth2-jose.version>7.0.3</spring-security-oauth2-jose.version>
-        <swagger-annotations.version>2.2.44</swagger-annotations.version>
+        <jackson-databind-nullable.version>0.2.10</jackson-databind-nullable.version>
+        <spring-boot.version>4.0.6</spring-boot.version>
+        <spring-security-oauth2-jose.version>7.0.5</spring-security-oauth2-jose.version>
+        <swagger-annotations.version>2.2.49</swagger-annotations.version>
         <!-- Plugins -->
-        <openapi-generator-maven-plugin.version>7.20.0</openapi-generator-maven-plugin.version>
-        <spring-boot-maven-plugin.version>${spring.boot.version}</spring-boot-maven-plugin.version>
+        <openapi-generator-maven-plugin.version>7.22.0</openapi-generator-maven-plugin.version>
+        <spring-boot-maven-plugin.version>${spring-boot.version}</spring-boot-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -47,7 +47,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

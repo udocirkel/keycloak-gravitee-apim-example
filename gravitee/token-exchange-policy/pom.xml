@@ -14,7 +14,7 @@
 
     <properties>
         <!-- Libs -->
-        <caffeine.version>3.2.3</caffeine.version>
+        <caffeine.version>3.2.4</caffeine.version>
         <!-- Plugin -->
         <json-schema-generator-maven-plugin.version>1.3.0</json-schema-generator-maven-plugin.version>
         <json-schema-generator-maven-plugin.outputDirectory>${project.build.directory}/schemas

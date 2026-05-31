@@ -20,8 +20,8 @@
 
     <properties>
         <!-- Libs -->
-        <gravitee-apim.version>4.10.7</gravitee-apim.version>
-        <gravitee-bom.version>8.3.47</gravitee-bom.version>
+        <gravitee-apim.version>4.11.7</gravitee-apim.version>
+        <gravitee-bom.version>8.3.61</gravitee-bom.version>
     </properties>
 
     <dependencyManagement>
