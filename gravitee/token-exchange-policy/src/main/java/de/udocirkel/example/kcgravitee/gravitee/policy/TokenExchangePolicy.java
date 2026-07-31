@@ -237,7 +237,7 @@ public class TokenExchangePolicy {
         httpResponse.bodyHandler(body -> {
             try {
 
-                if (!(body.toJson() instanceof JsonObject json)) {
+                if (!(body.toJsonValue() instanceof JsonObject json)) {
                     var errorContent = "Request is terminated.";
                     policyChain.failWith(PolicyResult.failure(TOKEN_EXCHANGE_EXIT_ON_ERROR, errorContent));
                     return;
