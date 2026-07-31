@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2015 The Gravitee team (http://gravitee.io)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -115,7 +115,7 @@ public class TokenExchangePolicyIntegrationTest extends AbstractPolicyTest<Token
 
         wiremock.stubFor(get("/backend").willReturn(ok("response from backend")));
 
-        client.get("/test").send(ar -> {
+        client.get("/test").send().onComplete(ar -> {
             assertThat(ar.succeeded()).isTrue();
 
             HttpResponse<Buffer> response = ar.result();
